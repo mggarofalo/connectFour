@@ -12,22 +12,22 @@ public class Game {
 	// + checkForWinOrDraw runs checkForWin and checkForDraw and return continue
 	// (0), draw (-1), or winning player ID
 
-	private final int width = 7;
-	private final int height = 6;
-	private final int players = 2;
-	private Object[] player = new Object[players]; // TODO: Convert to player array
-	private final int firstPlayer = pickFirstPlayer();
-	private int playerTurn = firstPlayer; // Initial value
+	protected final static int width = 7;
+	protected final static int height = 6;
+	protected final static int players = 2;
+	private final static Object[] player = new Object[players]; // TODO: Convert to player array
+	private final static int firstPlayer = pickFirstPlayer();
+	private final static int playerTurn = firstPlayer; // Initial value
 
 	// Initialize the board and log.
-	private Board board = new Board(width, height);
-	private BoardMoveLog log = new BoardMoveLog();
+	protected static Board board = new Board(width, height);
+	protected static BoardMoveLog log = new BoardMoveLog();
 
 	// Initialize a game
 	public Game() {
 	}
 
-	private int pickFirstPlayer() {
+	private static int pickFirstPlayer() {
 		Random r = new Random();
 		return r.nextDouble() >= 0.5 ? 1 : 0;
 	}
@@ -89,62 +89,18 @@ public class Game {
 		}
 
 		// Otherwise return the checkForDraw response
-		return checkForDraw();
+		return GameCompleteChecker.checkForDraw();
 	}
 
 	// Checks for a win and returns the winning player ID or -1 for no winner
 	private int checkForWin() {
-		int winner = checkForWinVertical();
-		// See if anybody has four in a row horizontally
+		int winner;
 
-		// See if anybody has four in a row ascending
+		winner = GameCompleteChecker.checkForWinVertical();
+		winner = GameCompleteChecker.checkForWinHorizontal();
+		winner = GameCompleteChecker.checkForWinAscending();
+		winner = GameCompleteChecker.checkForWinDescending();
 
-		// See if anybody has four in a row descending
-
-		return -1;
-	}
-
-	// Checks for a vertical win
-	private int checkForWinVertical() {
-		// Start at the bottom left corner
-		int counter = 0;
-		int c = 0; // Initial value
-		int r = 0; // Initial value
-
-		// For each row, starting at the bottom
-		for (int r = 0; r < (height - 3); r++) {
-			int winner = board.readBoardSquare(0, 0);
-			for (int c = 0; c < width; ++c) {
-				// For each column, starting at the left, but iterating early because we've
-				// already set the initial value
-				if (board.readBoardSquare(c, r) != winner) {
-					// We don't have a winner yet. Hit the next row.
-					break;
-				} else {
-					counter += 1;
-					if (counter == 4) {
-						return winner;
-					}
-				}
-			}
-		}
-
-		return -1;
-	}
-
-	// Checks for a draw and returns 0 for draw or -1 for no draw
-	private int checkForDraw() {
-		// Since this happens after win checking, we can see if the board is full first
-		if (log.readMoves().size() == (width * height)) {
-			return 0;
-		}
-
-		// Else iterate through the board to see if it's possible for either player to
-		// win
-		if (false) {
-			return 0;
-		}
-
-		return -1;
+		return winner;
 	}
 }
