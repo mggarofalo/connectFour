@@ -29,8 +29,8 @@ public class Board {
 		boardArray = new int[width][height];
 
 		// Set initial values to -1 to indicate empty
-		for (int c = 0; c < width; c++) {
-			for (int r = 0; r < height; r++) {
+		for (int c = 1; c < width; c++) {
+			for (int r = 1; r < height; r++) {
 				boardArray[c][r] = -1;
 			}
 		}

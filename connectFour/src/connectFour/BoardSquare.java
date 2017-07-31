@@ -18,9 +18,9 @@ public class BoardSquare {
 		return row;
 	}
 
-	// This doesn't need c/r input, but it'll read more easily if I require it
+	// This doesn't need a board, but it'll read more easily if I require it
 	public void moveLeft(Board board) {
-		if (col != 0) {
+		if (col != 1) {
 			col -= 1;
 		}
 	}
@@ -31,9 +31,9 @@ public class BoardSquare {
 		}
 	}
 
-	// This doesn't need c/r input, but it'll read more easily if I require it
+	// This doesn't need a board, but it'll read more easily if I require it
 	public void moveDown(Board board) {
-		if (row != 0) {
+		if (row != 1) {
 			row -= 1;
 		}
 	}
