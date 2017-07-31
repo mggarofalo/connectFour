@@ -22,12 +22,13 @@ Initial variables
 	
 
 PlayerInterface
-Takes console input and passes to board for validity check.
-Checks return value from board and passes play to the other player (0), displays invalidity message (1), displays tie message (2), or displays win message (3).
+Takes console input and runs validity check.
+Passes to board if valid; otherwise displays message to player
+Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win message (2).
 
 Level 1: AIPlayer (stub)
-Passes AI move to input collector.
-Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously.
+Finds best move (stub). Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously.
+Validity check may be unnecessary.
 
 Board
 Model is a Map<Pair<x, y>, v>, where v indicates the player (null = open).
