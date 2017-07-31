@@ -41,6 +41,17 @@ public class Board {
 		return boardArray;
 	}
 
+	// Returns the contents of a given coordinate set
+	public int readBoardSquare(int c, int r) {
+		BoardSquare square = new BoardSquare(c, r)
+		return readBoardSquare(square);
+	}
+
+	// Returns the contents of a given BoardSquare
+	public int readBoardSquare(BoardSquare square) {
+		return boardArray[square.col()][square.row()]
+	}
+
 	// Gets the lowest open row for a given column
 	public int getLowestRow(int c) {
 		for (int r = 0; r < height; r++) {
