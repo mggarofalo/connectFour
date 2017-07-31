@@ -22,33 +22,44 @@ public class Board {
 	public Board(int w, int h) {
 		// Set the width and height variables
 		// Note that we're converting from 0-base to 1-base here to avoid confusion
-		width = w + 1;
-		height = h + 1;
+		width = w;
+		height = h;
 
 		// Initialize a board to the width and height
 		boardArray = new int[width][height];
 
 		// Set initial values to -1 to indicate empty
-		for (int c = 1; c < width; c++) {
-			for (int r = 1; r < height; r++) {
+		for (int c = 0; c < width; c++) {
+			for (int r = 0; r < height; r++) {
 				boardArray[c][r] = -1;
 			}
 		}
 	}
 
 	// The board is private so that only the Board class can write to it. However,
-	// so that the game can read it, we have a read method.
+	// so that the Game class can read it, we have a read method.
 	public int[][] readBoard() {
 		return boardArray;
 	}
 
+	// Rotates the board for win checking
+	public void rotateBoardCW() {
+		int[][] rotation = new int[width][height];
+		for (int r = 0; r <= height; r++) {
+			for (int c = 0; c <= width; c++) {
+				rotation[c][height - r] = boardArray[r][c];
+			}
+		}
+		boardArray = rotation;
+	}
+
 	// Returns the width of the board
-	public int readWidth() {
+	public int width() {
 		return width;
 	}
 
 	// Return the height of the board
-	public int readHeight() {
+	public int height() {
 		return height;
 	}
 
@@ -90,17 +101,23 @@ public class Board {
 		// |1| |2|1|1|2| |
 
 		// Print column labels
-		for (int c = 1; c < width; c++) {
+		for (int c = 0; c < width; c++) {
 			System.out.print(" ");
-			System.out.print(c);
+
+			// Print the column header. If we're done, print a new line.
+			if (c == (width - 1)) {
+				System.out.println(c + 1);
+			} else {
+				System.out.print(c + 1);
+			}
 		}
 
-		for (int r = height - 1; r >= 1; r--) {
+		for (int r = height - 1; r >= 0; r--) {
 			// Initial border
 			System.out.print("|");
 
 			// Loop through columns in row
-			for (int c = 1; c < width; c++) {
+			for (int c = 0; c < width; c++) {
 				// Print blank space if the space is empty; otherwise print the player number.
 				if (boardArray[c][r] == -1) {
 					System.out.print(" ");
@@ -109,7 +126,7 @@ public class Board {
 				}
 
 				// Print a closing border and, if we're done with this row, a new line.
-				if (c == width) {
+				if (c == (width - 1)) {
 					System.out.println("|");
 				} else {
 					System.out.print("|");

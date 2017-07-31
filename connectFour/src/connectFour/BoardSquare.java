@@ -21,11 +21,11 @@ public class BoardSquare {
 	public void move(Board board, String direction) {
 		if (direction.equalsIgnoreCase("left") && col != 1) {
 			col -= 1;
-		} else if (direction.equalsIgnoreCase("right") && col < board.readWidth()) {
+		} else if (direction.equalsIgnoreCase("right") && col < board.width()) {
 			col += 1;
 		} else if (direction.equalsIgnoreCase("down") && (row != 1)) {
 			row -= 1;
-		} else if (direction.equalsIgnoreCase("up") && row < board.readHeight()) {
+		} else if (direction.equalsIgnoreCase("up") && row < board.height()) {
 			row += 1;
 		}
 	}

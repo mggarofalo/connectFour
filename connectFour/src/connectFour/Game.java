@@ -12,22 +12,29 @@ public class Game {
 	// + checkForWinOrDraw runs checkForWin and checkForDraw and return continue
 	// (0), draw (-1), or winning player ID
 
-	protected final static int width = 7;
-	protected final static int height = 6;
-	protected final static int players = 2;
-	private final static Object[] player = new Object[players]; // TODO: Convert to player array
-	private final static int firstPlayer = pickFirstPlayer();
-	private final static int playerTurn = firstPlayer; // Initial value
+	protected int width;
+	protected int height;
+	protected int players;
+	protected GameCompleteChecker checker;
+	private Object[] player; // TODO: Convert to player array
+	private int firstPlayer;
+	private int playerTurn;
 
 	// Initialize the board and log.
-	protected static Board board = new Board(width, height);
-	protected static BoardMoveLog log = new BoardMoveLog();
+	protected Board board = new Board(width, height);
+	protected BoardMoveLog log = new BoardMoveLog();
 
 	// Initialize a game
 	public Game() {
+		width = 7;
+		height = 6;
+		players = 2;
+		player = new Object[players];
+		firstPlayer = pickFirstPlayer();
+		playerTurn = firstPlayer;
 	}
 
-	private static int pickFirstPlayer() {
+	private int pickFirstPlayer() {
 		Random r = new Random();
 		return r.nextDouble() >= 0.5 ? 1 : 0;
 	}
@@ -75,7 +82,7 @@ public class Game {
 	}
 
 	// Takes a player ID and move to log and add to the board
-	public void makeMove(int player, BoardSquare move) {
+	private void makeMove(int player, BoardSquare move) {
 		log.addMove(player, move);
 		board.makeMove(player, move);
 	}
@@ -89,17 +96,17 @@ public class Game {
 		}
 
 		// Otherwise return the checkForDraw response
-		return GameCompleteChecker.checkForDraw();
+		return checker.checkForDraw();
 	}
 
 	// Checks for a win and returns the winning player ID or -1 for no winner
 	private int checkForWin() {
 		int winner;
 
-		winner = GameCompleteChecker.checkForWinVertical();
-		winner = GameCompleteChecker.checkForWinHorizontal();
-		winner = GameCompleteChecker.checkForWinAscending();
-		winner = GameCompleteChecker.checkForWinDescending();
+		winner = checker.checkForWinStraight();
+		winner = checker.checkForWinHorizontal();
+		winner = checker.checkForWinAscending();
+		winner = checker.checkForWinDescending();
 
 		return winner;
 	}
