@@ -40,6 +40,16 @@ public class Board {
 	public int[][] readBoard() {
 		return boardArray;
 	}
+	
+	// Returns the width of the board
+	public int readWidth() {
+		return width;
+	}
+	
+	// Return the height of the board
+	public int readHeight() {
+		return height;
+	}
 
 	// Returns the contents of a given coordinate set
 	public int readBoardSquare(int c, int r) {

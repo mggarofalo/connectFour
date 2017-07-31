@@ -19,27 +19,27 @@ public class BoardSquare {
 	}
 
 	// This doesn't need c/r input, but it'll read more easily if I require it
-	public void moveLeft(int c, int r) {
+	public void moveLeft(Board board) {
 		if (col != 0) {
 			col -= 1;
 		}
 	}
 
-	public void moveRight(int c, int r) {
-		if (col < c) {
+	public void moveRight(Board board) {
+		if (col < board.readWidth()) {
 			col += 1;
 		}
 	}
 
 	// This doesn't need c/r input, but it'll read more easily if I require it
-	public void moveDown(int c, int r) {
+	public void moveDown(Board board) {
 		if (row != 0) {
 			row -= 1;
 		}
 	}
 
-	public void moveUp(int c, int r) {
-		if (row < r) {
+	public void moveUp(Board board) {
+		if (row < board.readHeight()) {
 			row += 1;
 		}
 	}
