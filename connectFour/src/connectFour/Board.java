@@ -1,59 +1,98 @@
 package connectFour;
 
 public class Board {
+	// Method list:
+	// readBoard returns the current board as int[][]
+	// getLowestRow returns the lowest open row or -1 if the column is full
+	// makeMove sets a coordinate to the given player ID
+	// printBoard prints the current board state to the console
 
-	private int width = 7;
-	private int height = 6;
+	// About:
+	// Standard Connect Four is played on a 7-wide by 6-high board. Throughout this
+	// class, c refers to column (width) and r refers to row (height). NB: games
+	// over 10x10 will not be displayed properly.
 
-	// Initialize the log
-	private BoardMoveLog log = new BoardMoveLog();
+	private final int width;
+	private final int height;
 
-	// The board is a two-dimensional integer matrix
-	// where the value is player ID or -1 for empty
-	private int[][] board = new int[][] {};
+	// The board is a two-dimensional player ID int matrix (-1 is empty). Board
+	// spaces are checked with board[c][r]. It's public so an AI can read it.
+	private int[][] boardArray = new int[][] {};
 
-	public Board() {
+	public Board(int w, int h) {
+		// Set the width and height variables
+		width = w;
+		height = h;
+
 		// Initialize a board to the width and height
-		board = new int[width][height];
-		
+		boardArray = new int[width][height];
+
 		// Set initial values to -1 to indicate empty
-		for (int w = 0; w < width; w++) {
-			for (int h = 0; h < height; h++) {
-				board[w][h] = -1;
+		for (int c = 0; c < width; c++) {
+			for (int r = 0; r < height; r++) {
+				boardArray[c][r] = -1;
 			}
 		}
 	}
 
-	public void logMove(int player, int col) {
-		// First, convert the column to a move.
-		BoardSquare move = new BoardSquare(col, getLowestRow(col));
-
-		// Then call the logMove overload
-		logMove(player, move);
+	// The board is private so that only the Board class can write to it. However,
+	// so that the game can read it, we have a read method.
+	public int[][] readBoard() {
+		return boardArray;
 	}
 
-	public void logMove(int player, BoardSquare move) {
-		// If we pass a validity check (necessary because this is public)
-		// then add the move to the move log and board
-		if (isValidMove(move)) {
-			log.addMove(player, move);
-			board[move.col()][move.row()] = player;
-		}
-	}
-
-	public boolean isValidMove(BoardSquare move) {
-		// Checks the move list for a given BoardSquare
-		for (int i = 0; i < log.squares.size(); i++) {
-
-			if (log.squares.contains(move)) {
-				return false;
+	// Gets the lowest open row for a given column
+	public int getLowestRow(int c) {
+		for (int r = 0; r < height; r++) {
+			if (boardArray[c][r] == -1) {
+				return r;
 			}
 		}
-		return true;
+
+		// If the column is full, return -1
+		return -1;
 	}
 
-	public int getLowestRow(int col) {
-		return 1;
+	// Takes a player ID and move to log and add to display
+	public void makeMove(int player, BoardSquare square) {
+		boardArray[square.col()][square.row()] = player;
 	}
 
+	// Prints the board to the console
+	public void printBoard() {
+		// Print board contents to look like this:
+		// Note: stupid Eclipse auto-format doesn't keep leading spaces, hence ///
+		/// 1 2 3 4 5 6 7
+		// | | | | | | | |
+		// | | | | | | | |
+		// |1| |2|1|1|2| |
+
+		// Print column labels
+		for (int c = 0; c < width; c++) {
+			System.out.print(" ");
+			System.out.print(c);
+		}
+
+		for (int r = height - 1; r >= 0; r--) {
+			// Initial border
+			System.out.print("|");
+
+			// Loop through columns in row
+			for (int c = 0; c < width; c++) {
+				// Print blank space if the space is empty; otherwise print the player number.
+				if (boardArray[c][r] == -1) {
+					System.out.print(" ");
+				} else {
+					System.out.print(boardArray[c][r]);
+				}
+
+				// Print a closing border and, if we're done with this row, a new line.
+				if (c == width) {
+					System.out.println("|");
+				} else {
+					System.out.print("|");
+				}
+			}
+		}
+	}
 }

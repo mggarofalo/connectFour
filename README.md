@@ -16,38 +16,44 @@ Boss Level: I probably won't be able to do this because I don't think I'll have 
 Component List
 
 Initial variables
-	Board size (default 7x6y, but there's no reason that couldn't be altered)
+	Board size (default 7c6r, but there's no reason that couldn't be altered)
 	Level 1: Human/AI selector for P1 and P2 (the player will be a controller and its input will come from the command line or from a decision engine of some kind); in this case, we will also initialize first player selection
 	Boss: Difficulty selector for each AI that governs whether it plays randomly except to block
 	
-
-PlayerInterface
-Takes console input and runs validity check.
-Passes to board if valid; otherwise displays message to player
-Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win message (2).
-
 Level 1: AIPlayer (stub)
 Finds best move (stub). Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously.
 Validity check may be unnecessary.
 
+PlayerInterface
+  Takes console input and passes to board.
+  Displays message to player if the requested move is invalid.
+  Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win message (2).
+
 Board
-Model is a Map<Pair<x, y>, v>, where v indicates the player (null = open).
-Takes column from player.
-Checks the column's validity (it must be a real column, the coordinate Pair<rowCount, selectedColumn> must be empty).
-Returns (1) to player if invalid, triggering message.
-Finds the lowest open row in the given column.
-Changes the value of the Pair<lowestOpenRow, selectedColumn> to the player's identifier.
-Displays the board by iterating through the map and printing output to the console.
-Checks for a win or tie. If the game is over, returns tie (2) or win (3) to the player.
-Otherwise returns (0) to the player.
+X Model is an int[c][r], where -1 means empty and 0 or 1 is player ID.
+X Takes column from player or move from AI.
+X Checks the column's validity (it must be a real column, the coordinate BoardSquare(c, r) must be empty).
+X Returns value to player, triggering message.
+X Finds the lowest open row in the given column.
+X Displays the board by iterating through the matrix and printing output to the console.
+X Otherwise returns (0) to the player.
+
+Game
+  Keeps track of current turn.
+  Checks for a win or tie. If the game is over, returns tie (1) or win (2) to the player. Otherwise returns 0.
+  Calls player action (listener for human, decision method for AI).
 
 MoveLog
-Model is a List<Object[]>. The array will contain a a timestamp (import java.util.Date), a player ID (0 or 1), and a Pair<x, y> (coordinates).
+  Model is an ArrayList<Object[]>. The array will contain a a date and time (java.util.Date), a player ID (0 or 1), and a BoardSquare<c, r>.
+
+BoardSquare
+X Model is two ints (c, r).
+X Methods to get column and row.
 
 
 
 Automated flow loop after board initialization and turn order decision:
-1) The board checks win conditions and displays the current board
+1) The game checks win conditions and displays the current board
 2) The board displays any applicable message
 3) The player or AI generates a move and submits it to the board object
 4) The board object checks the validity of the move and rejects (GOTO 3) or accepts the move
