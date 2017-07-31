@@ -18,28 +18,14 @@ public class BoardSquare {
 		return row;
 	}
 
-	// This doesn't need a board, but it'll read more easily if I require it
-	public void moveLeft(Board board) {
-		if (col != 1) {
+	public void move(Board board, String direction) {
+		if (direction.equalsIgnoreCase("left") && col != 1) {
 			col -= 1;
-		}
-	}
-
-	public void moveRight(Board board) {
-		if (col < board.readWidth()) {
+		} else if (direction.equalsIgnoreCase("right") && col < board.readWidth()) {
 			col += 1;
-		}
-	}
-
-	// This doesn't need a board, but it'll read more easily if I require it
-	public void moveDown(Board board) {
-		if (row != 1) {
+		} else if (direction.equalsIgnoreCase("down") && (row != 1)) {
 			row -= 1;
-		}
-	}
-
-	public void moveUp(Board board) {
-		if (row < board.readHeight()) {
+		} else if (direction.equalsIgnoreCase("up") && row < board.readHeight()) {
 			row += 1;
 		}
 	}
