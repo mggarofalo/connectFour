@@ -7,6 +7,11 @@ public class GameOverChecker {
 	// despite the name, means that the line is descending from left to right. We
 	// actually check it left to right because that way we're always climbing.
 	public static int checkForWin(Game game, Board board, boolean straight, boolean verticalOrDescending) {
+		// Returns:
+		// 0 = No win detected
+		// 1 = Player 1 won
+		// 2 = Player 2 won
+
 		int width = board.width();
 		int height = board.height();
 
@@ -52,9 +57,9 @@ public class GameOverChecker {
 					// Increment the counter
 					counter += 1;
 
-					// If we have four in a row, declare the winner
+					// If we have four in a row, declare the winner as Player 1 or Player 2
 					if (counter == 4) {
-						return playerWhoMightWin; // HOORAY!
+						return (playerWhoMightWin + 1); // HOORAY!
 					}
 				}
 
@@ -112,7 +117,7 @@ public class GameOverChecker {
 				// This triggers the fourth time through. Since the original board is still in
 				// the Game object, we can just return that there wasn't a winner if this
 				// triggers.
-				return -1;
+				return 0;
 			}
 		}
 

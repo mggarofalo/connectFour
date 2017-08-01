@@ -3,37 +3,43 @@ package connectFour;
 public class Board {
 	// Method list:
 	// readBoard returns the current board as int[][]
+	// readBoardSquare returns the value of a BoardSquare coordinate
 	// getLowestRow returns the lowest open row or -1 if the column is full
 	// makeMove sets a coordinate to the given player ID
 	// printBoard prints the current board state to the console
 
 	// About:
 	// Standard Connect Four is played on a 7-wide by 6-high board. Throughout this
-	// class, c refers to column (width) and r refers to row (height). NB: games
-	// over 10x10 will not be displayed properly.
+	// class, r refers to row (height) and c refers to column (width). NB: games
+	// over 10x10 will not be displayed properly, but they should play normally.
 
-	private final int width;
-	private final int height;
+	private final int rows;
+	private final int columns;
 
-	// The board is a two-dimensional player ID int matrix (-1 is empty). Board
-	// spaces are checked with board[c][r]. It's public so an AI can read it.
+	// The board is a two-dimensional int matrix (-1 is empty). Board spaces are
+	// checked with board[r][c] (board[h][w]).
 	private int[][] boardArray = new int[][] {};
 
-	public Board(int w, int h) {
+	public Board(int rowTotal, int columnTotal) {
 		// Set the width and height variables
-		// Note that we're converting from 0-base to 1-base here to avoid confusion
-		width = w;
-		height = h;
+		this.rows = rowTotal;
+		this.columns = columnTotal;
 
-		// Initialize a board to the width and height
-		boardArray = new int[width][height];
+		// Initialize a board to the proper dimensions
+		this.boardArray = new int[rows][columns];
 
 		// Set initial values to -1 to indicate empty
-		for (int c = 0; c < width; c++) {
-			for (int r = 0; r < height; r++) {
-				boardArray[c][r] = -1;
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < columns; col++) {
+				boardArray[row][col] = -1;
 			}
 		}
+	}
+
+	public Board(int[][] boardArray) {
+		rows = (boardArray.length);
+		columns = (boardArray[0].length);
+		this.boardArray = boardArray;
 	}
 
 	// The board is private so that only the Board class can write to it. However,
@@ -42,43 +48,26 @@ public class Board {
 		return boardArray;
 	}
 
-	// Rotates the board for win checking
-	public void rotateBoardCW() {
-		int[][] rotation = new int[width][height];
-		for (int r = 0; r <= height; r++) {
-			for (int c = 0; c <= width; c++) {
-				rotation[c][height - r] = boardArray[r][c];
-			}
-		}
-		boardArray = rotation;
+	// Return the height of the board
+	public int height() {
+		return rows;
 	}
 
 	// Returns the width of the board
 	public int width() {
-		return width;
-	}
-
-	// Return the height of the board
-	public int height() {
-		return height;
-	}
-
-	// Returns the contents of a given coordinate set
-	public int readBoardSquare(int c, int r) {
-		BoardSquare square = new BoardSquare(c, r);
-		return readBoardSquare(square);
+		return columns;
 	}
 
 	// Returns the contents of a given BoardSquare
 	public int readBoardSquare(BoardSquare square) {
-		return boardArray[square.col()][square.row()];
+		return boardArray[square.row()][square.col()];
 	}
 
 	// Gets the lowest open row for a given column
-	public int getLowestRow(int c) {
-		for (int r = 1; r < height; r++) {
-			if (boardArray[c][r] == -1) {
-				return r;
+	public int getLowestRow(int col) {
+		for (int row = (rows - 1); row >= 0; row--) {
+			if (boardArray[row][col] == -1) {
+				return row;
 			}
 		}
 
@@ -88,7 +77,7 @@ public class Board {
 
 	// Takes a player ID and move to log and add to display
 	public void makeMove(int player, BoardSquare square) {
-		boardArray[square.col()][square.row()] = player;
+		boardArray[square.row()][square.col()] = player;
 	}
 
 	// Prints the board to the console
@@ -101,37 +90,37 @@ public class Board {
 		// |1| |2|1|1|2| |
 
 		// Print column labels
-		for (int c = 0; c < width; c++) {
+		for (int col = 0; col < columns; col++) {
 			System.out.print(" ");
 
 			// Print the column header. If we're done, print a new line.
-			if (c == (width - 1)) {
-				System.out.println(c + 1);
+			if (col == (columns - 1)) {
+				System.out.println(col + 1);
 			} else {
-				System.out.print(c + 1);
+				System.out.print(col + 1);
 			}
 		}
 
-		for (int r = height - 1; r >= 0; r--) {
+		// Loop through rows
+		for (int row = 0; row < rows; row++) {
 			// Initial border
 			System.out.print("|");
 
 			// Loop through columns in row
-			for (int c = 0; c < width; c++) {
+			for (int col = 0; col < columns; col++) {
 				// Print blank space if the space is empty; otherwise print the player number.
-				if (boardArray[c][r] == -1) {
+				if (boardArray[row][col] == -1) {
 					System.out.print(" ");
 				} else {
-					System.out.print(boardArray[c][r]);
+					System.out.print(boardArray[row][col]);
 				}
 
-				// Print a closing border and, if we're done with this row, a new line.
-				if (c == (width - 1)) {
-					System.out.println("|");
-				} else {
-					System.out.print("|");
-				}
+				// Dividing border
+				System.out.print("|");
 			}
+
+			// End the row and loop again
+			System.out.println();
 		}
 	}
 }

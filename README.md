@@ -17,20 +17,20 @@ Component List
 
 Initial variables
 	Board size (default 7c6r, but there's no reason that couldn't be altered)
-	Level 1: Human/AI selector for P1 and P2 (the player will be a controller and its input will come from the command line or from a decision engine of some kind); in this case, we will also initialize first player selection
+	Level 1/2: Human/AI selector for P1 and P2 (the player will be a controller and its input will come from the command line or from a decision engine of some kind); in this case, we will also initialize first player selection
 	Boss: Difficulty selector for each AI that governs whether it plays randomly except to block
 	
-Level 1: AIPlayer (stub)
+Level 2: AIPlayer (stub)
 Finds best move (stub). Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously.
 Validity check may be unnecessary.
 
 PlayerInterface
   Takes console input and passes to board.
   Displays message to player if the requested move is invalid.
-  Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win message (2).
+  Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win (2) or loss (3) message.
 
 Board
-X Model is an int[c][r], where -1 means empty and 0 or 1 is player ID.
+X Model is an int[rows][columns], where -1 means empty and 0 or 1 is player ID.
 X Takes column from player or move from AI.
 X Checks the column's validity (it must be a real column, the coordinate BoardSquare(c, r) must be empty).
 X Returns value to player, triggering message.
@@ -40,21 +40,21 @@ X Otherwise returns (0) to the player.
 
 Game
   Keeps track of current turn.
-  Checks for a win or tie. If the game is over, returns tie (1) or win (2) to the player. Otherwise returns 0.
+X Checks for a win or tie. If the game is over, returns tie (-1) or win (player ID + 1) to the player. Otherwise returns 0 and the game continues.
   Calls player action (listener for human, decision method for AI).
 
 MoveLog
-  Model is an ArrayList<Object[]>. The array will contain a a date and time (java.util.Date), a player ID (0 or 1), and a BoardSquare<c, r>.
+X Model is an ArrayList of BoardMoves. BoardMoves contain a a date and time (java.util.Date), a player ID (0 or 1), and a BoardSquare<c, r>.
 
 BoardSquare
-X Model is two ints (c, r).
-X Methods to get column and row.
+X Model is two ints (r, c).
+X Methods to get row and column.
 
 
 
 Automated flow loop after board initialization and turn order decision:
 1) The game checks win conditions and displays the current board
-2) The board displays any applicable message
+2) The player controller displays any applicable message
 3) The player or AI generates a move and submits it to the board object
 4) The board object checks the validity of the move and rejects (GOTO 3) or accepts the move
 5) The board logs the move as coordinates + player + timestamp

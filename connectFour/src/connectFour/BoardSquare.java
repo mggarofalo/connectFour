@@ -2,12 +2,12 @@ package connectFour;
 
 public class BoardSquare {
 
-	private int col;
 	private int row;
+	private int col;
 
-	public BoardSquare(int aCol, int aRow) {
-		col = aCol;
+	public BoardSquare(int aRow, int aColumn) {
 		row = aRow;
+		col = aColumn;
 	}
 
 	public int col() {
