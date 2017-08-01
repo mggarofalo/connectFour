@@ -18,7 +18,7 @@ public class BoardSquare {
 		return row;
 	}
 
-	public void move(BoardController boardController, String direction) {
+	public void move(String direction) {
 		if (direction.equalsIgnoreCase("N")) {
 			row -= 1;
 		}
@@ -36,23 +36,23 @@ public class BoardSquare {
 		}
 
 		if (direction.equalsIgnoreCase("NE")) {
-			move(boardController, "N");
-			move(boardController, "E");
+			move("N");
+			move("E");
 		}
 
 		if (direction.equalsIgnoreCase("SE")) {
-			move(boardController, "S");
-			move(boardController, "E");
+			move("S");
+			move("E");
 		}
 
 		if (direction.equalsIgnoreCase("SW")) {
-			move(boardController, "S");
-			move(boardController, "W");
+			move("S");
+			move("W");
 		}
 
 		if (direction.equalsIgnoreCase("NW")) {
-			move(boardController, "N");
-			move(boardController, "W");
+			move("N");
+			move("W");
 		}
 	}
 }

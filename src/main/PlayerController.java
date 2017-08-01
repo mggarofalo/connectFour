@@ -7,8 +7,8 @@ public class PlayerController {
 	public PlayerController() {
 	}
 
-	public PlayerController(String name, boolean isHuman) {
-		this.player = new Player(name, isHuman);
+	public PlayerController(String name, String token, int index, boolean isHuman) {
+		this.player = new Player(name, token, index, isHuman);
 	}
 
 	public Player getPlayer() {

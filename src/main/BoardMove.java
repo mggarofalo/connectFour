@@ -5,24 +5,24 @@ import java.util.Date;
 public class BoardMove {
 
 	private final Date date;
-	private final int player;
+	private final Player player;
 	private final BoardSquare move;
 
-	public BoardMove(Date aDate, int aPlayer, BoardSquare aMove) {
+	public BoardMove(Date aDate, Player aPlayer, BoardSquare aMove) {
 		date = aDate;
 		player = aPlayer;
 		move = aMove;
 	}
 
-	public Date getDate(BoardMove move) {
-		return move.date;
+	public Date getDate() {
+		return this.date;
 	}
 
-	public int getPlayer(BoardMove move) {
-		return move.player;
+	public Player getPlayer() {
+		return this.player;
 	}
 
-	public BoardSquare getBoardSquare(BoardMove move) {
-		return move.move;
+	public BoardSquare getBoardSquare() {
+		return this.move;
 	}
 }

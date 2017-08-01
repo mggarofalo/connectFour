@@ -19,7 +19,7 @@ public class BoardMoveLog {
 	// The ArrayList will naturally be in chronological order.
 	private ArrayList<BoardMove> moves = new ArrayList<BoardMove>();
 
-	public void addMove(int player, BoardSquare move) {
+	public void addMove(Player player, BoardSquare move) {
 		// Takes a player and BoardSquare and adds them to the ArrayList.
 		moves.add(new BoardMove(new Date(), player, move));
 	}

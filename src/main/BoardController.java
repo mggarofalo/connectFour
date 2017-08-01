@@ -67,7 +67,7 @@ public class BoardController {
 	}
 
 	// Prints the board to the console
-	public void printBoard() {
+	public void printBoard(PlayerController[] playerController) {
 		// Print board contents to look like this:
 		// Note: Eclipse auto-format doesn't keep leading spaces, hence ///
 		/// 1 2 3 4 5 6 7
@@ -81,9 +81,9 @@ public class BoardController {
 
 			// Print the column header. If we're done, print a new line.
 			if (col == (columns - 1)) {
-				System.out.println(col + 1);
+				System.out.println(Utilities.padString(String.valueOf(col + 1), " ", String.valueOf(columns).length()));
 			} else {
-				System.out.print(col + 1);
+				System.out.print(Utilities.padString(String.valueOf(col + 1), " ", String.valueOf(columns).length()));
 			}
 		}
 
@@ -96,9 +96,12 @@ public class BoardController {
 			for (int col = 0; col < columns; col++) {
 				// Print blank space if the space is empty; otherwise print the player number.
 				if (board.boardArray[row][col] == -1) {
-					System.out.print(" ");
+					System.out.print(Utilities.padString(" ", null,
+							String.valueOf(columns).length() + 1 - String.valueOf(col + 1).length()));
 				} else {
-					System.out.print(board.boardArray[row][col]);
+					System.out.print(
+							Utilities.padString(playerController[board.boardArray[row][col]].getPlayer().getToken(),
+									" ", String.valueOf(columns).length()));
 				}
 
 				// Dividing border
@@ -108,13 +111,10 @@ public class BoardController {
 			// End the row and loop again
 			System.out.println();
 		}
-
-		// Print a spacer line
-		System.out.println();
 	}
 
 	// Takes a player ID and column to log.
-	public int tryMove(int player, int col) {
+	public int tryMove(Player player, int col) {
 		// If the column isn't valid, return -2
 		if (col < 0 || col >= columns) {
 			return -2;
@@ -151,9 +151,9 @@ public class BoardController {
 	}
 
 	// Takes a player ID and move to log and add to the board
-	private void makeMove(int player, BoardSquare move) {
+	private void makeMove(Player player, BoardSquare move) {
 		log.addMove(player, move);
-		board.boardArray[move.row()][move.col()] = player;
+		board.boardArray[move.row()][move.col()] = player.getIndex();
 	}
 
 	// Checks for a win (player ID) or a draw (-1)
@@ -165,7 +165,7 @@ public class BoardController {
 		// -1 = Draw detected (checkForDraw)
 
 		// Check for a winner
-		int winner = BoardControllerCompletionChecker.checkForWin(this, null);
+		int winner = BoardIterator.checkForWin(this);
 
 		// If we have a win, return the player number
 		if (winner != 0) {
@@ -173,7 +173,7 @@ public class BoardController {
 		}
 
 		// Otherwise check for a draw
-		int draw = BoardControllerCompletionChecker.checkForDraw(this);
+		int draw = BoardIterator.checkForDraw(this);
 
 		// Return an appropriate value
 		if (draw == 0) {

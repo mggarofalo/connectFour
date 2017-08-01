@@ -1,11 +1,7 @@
 package main;
 
-import java.util.Random;
-import java.util.Scanner;
-
 public class GameController {
 
-	private Scanner key = new Scanner(System.in);
 	private PlayerController[] playerController;
 	private BoardController boardController;
 	private int turn;
@@ -18,8 +14,8 @@ public class GameController {
 	}
 
 	private int pickFirstPlayer() {
-		Random r = new Random();
-		return r.nextDouble() >= 0.5 ? 1 : 0;
+		Double rand = Math.random() * playerController.length;
+		return rand.intValue();
 	}
 
 	public void play() {
@@ -28,29 +24,30 @@ public class GameController {
 			int tryMoveResponse;
 
 			// Print the board
-			boardController.printBoard();
+			boardController.printBoard(playerController);
 
 			// Print the prompt
-			System.out.print("Your turn, " + playerController[turn].getPlayer().getName() + ". Pick a column (1-"
-					+ boardController.width() + "): ");
+			System.out.print("Your turn, " + playerController[turn].getPlayer().getName() + " ("
+					+ playerController[turn].getPlayer().getToken() + "). Pick a column (1-" + boardController.width()
+					+ "): ");
 
 			// Handle the input
-			selectedColumn = key.nextInt();
+			selectedColumn = Utilities.makeUserInputANumber() - 1;
 
-			// Convert selection to index
-			selectedColumn -= 1;
-
-			// Interpret the response
-			tryMoveResponse = handleTryMoveResponse(boardController.tryMove(turn, selectedColumn));
+			// Get and interpret the response
+			tryMoveResponse = handleTryMoveResponse(
+					boardController.tryMove(playerController[turn].getPlayer(), selectedColumn));
 
 			if (tryMoveResponse == 1) {
 				// If the game is over, change the boolean so the program can exit
 				gameOver = true;
 			} else if (tryMoveResponse == 0) {
 				// If the move was valid, swap turns
-				swapTurn();
+				incrementOrResetTurn();
 			}
+
 		} while (!gameOver);
+
 	}
 
 	public int handleTryMoveResponse(int response) {
@@ -82,14 +79,16 @@ public class GameController {
 	}
 
 	private void displayWinMessage(int winner) {
+		boardController.printBoard(playerController);
+		System.out.println();
 		System.out.println("Congratulations on your win, " + playerController[winner - 1].getPlayer().getName() + "!");
 	}
 
-	private void swapTurn() {
-		if (turn == 0) {
-			turn = 1;
-		} else {
+	private void incrementOrResetTurn() {
+		if (turn == (playerController.length - 1)) {
 			turn = 0;
+		} else {
+			turn += 1;
 		}
 	}
 }
