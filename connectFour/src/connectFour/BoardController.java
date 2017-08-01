@@ -1,8 +1,6 @@
 package connectFour;
 
-import java.util.Random;
-
-public class Game {
+public class BoardController {
 	/*
 	 * Method list: + pickFirstPlayer generates a random player order + readBoard
 	 * returns the current board state for AI reading + readLog returns the game log
@@ -14,29 +12,16 @@ public class Game {
 
 	private int rowTotal;
 	private int columnTotal;
-	/*
-	 * private int players; private Object[] player; // TODO: Convert to player
-	 * array private int firstPlayer; private int playerTurn;
-	 */
 
 	// Initialize the board and log.
 	private Board board = new Board(rowTotal, columnTotal);
 	private BoardMoveLog log = new BoardMoveLog();
 
 	// Initialize a game
-	public Game() {
-		columnTotal = 7;
-		rowTotal = 6;
-		/*
-		 * players = 2; player = new Object[players]; firstPlayer = pickFirstPlayer();
-		 * playerTurn = firstPlayer;
-		 */
+	public BoardController(int rowTotal, int columnTotal) {
+		this.rowTotal = rowTotal;
+		this.columnTotal = columnTotal;
 	}
-
-	/*
-	 * private int pickFirstPlayer() { Random r = new Random(); return
-	 * r.nextDouble() >= 0.5 ? 1 : 0; }
-	 */
 
 	// The board is private so that only the Board class can write to it. However,
 	// so that the AI can read it, we have a read method.
@@ -90,7 +75,7 @@ public class Game {
 		// -1 = Draw detected (checkForDraw)
 
 		// Check for a winner
-		int winner = GameOverChecker.checkForWin(this, board, true, true);
+		int winner = BoardControllerCompletionChecker.checkForWin(this, board, true, true);
 
 		// If we have a win, return the player number
 		if (winner != 0) {
@@ -98,7 +83,7 @@ public class Game {
 		}
 
 		// Otherwise check for a draw
-		int draw = GameOverChecker.checkForDraw(this, board);
+		int draw = BoardControllerCompletionChecker.checkForDraw(this, board);
 
 		// Return an appropriate value
 		if (draw == 0) {

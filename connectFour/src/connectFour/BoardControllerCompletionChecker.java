@@ -1,12 +1,12 @@
 package connectFour;
 
-public class GameOverChecker {
+public class BoardControllerCompletionChecker {
 
 	// Checks for wins in four directions. We pass two booleans to combine for the
 	// four states. If runAgain, we're doing vertical or descending. Descending,
 	// despite the name, means that the line is descending from left to right. We
 	// actually check it left to right because that way we're always climbing.
-	public static int checkForWin(Game game, Board board, boolean straight, boolean verticalOrDescending) {
+	public static int checkForWin(BoardController game, Board board, boolean straight, boolean verticalOrDescending) {
 		// Returns:
 		// 0 = No win detected
 		// 1 = Player 1 won
@@ -130,7 +130,7 @@ public class GameOverChecker {
 	}
 
 	// Checks for a draw and returns 0 for draw or -1 for no draw
-	public static int checkForDraw(Game game, Board board) {
+	public static int checkForDraw(BoardController game, Board board) {
 		// Since this happens after win checking, we can see if the board is full first
 		if (game.readLog().readMoves().size() == (board.width() * board.height())) {
 			return 0;
