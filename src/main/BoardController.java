@@ -15,6 +15,10 @@ public class BoardController {
 	private Board board;
 	private BoardMoveLog log;
 
+	enum CheckType {
+		V, H, D, A
+	}
+
 	// Initialize a game
 	public BoardController(int rowTotal, int columnTotal) {
 		this.rows = rowTotal;
@@ -164,12 +168,14 @@ public class BoardController {
 		// 2 = Player 2 wins (checkForWin)
 		// -1 = Draw detected (checkForDraw)
 
-		// Check for a winner
-		int winner = BoardControllerCompletionChecker.checkForWin(this, null);
+		for (CheckType ct : CheckType.values()) {
+			// Check for a winner
+			int winner = BoardControllerCompletionChecker.checkForWin(this, ct);
 
-		// If we have a win, return the player number
-		if (winner != 0) {
-			return winner;
+			// If we have a win, return the player number
+			if (winner != 0) {
+				return winner;
+			}
 		}
 
 		// Otherwise check for a draw
