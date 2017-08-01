@@ -1,4 +1,4 @@
-package connectFour;
+package main;
 
 public class Player {
 

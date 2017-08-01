@@ -1,4 +1,4 @@
-package connectFour;
+package main;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package connectFour;
+package main;
 
 public class PlayerController {
 
@@ -7,7 +7,7 @@ public class PlayerController {
 	public PlayerController() {
 	}
 
-	public void initializePlayer(String name, boolean isHuman) {
+	public PlayerController(String name, boolean isHuman) {
 		this.player = new Player(name, isHuman);
 	}
 

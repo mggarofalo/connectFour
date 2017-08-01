@@ -1,10 +1,10 @@
-package connectFour;
+package main;
 
 import java.util.Scanner;
 
 public class ConnectFour {
 
-	public static void main() {
+	public static void main(String[] args) {
 		int columns = 7;
 		int rows = 6;
 		String name;
@@ -36,27 +36,24 @@ public class ConnectFour {
 		// If they didn't say no, then too bad
 
 		System.out.println();
-		System.out.print("Okay, person who loaded me. What's your name?");
+		System.out.print("Okay, person who loaded me. What's your name? ");
 
 		name = key.next();
-		playerController[0].initializePlayer(name, true);
+		playerController[0] = new PlayerController(name, true);
 
 		System.out.println();
-		System.out.print("And what about you, friendo?");
+		System.out.print("And what about you, friendo? ");
 
 		name = key.next();
-		playerController[1].initializePlayer(name, true);
+		playerController[1] = new PlayerController(name, true);
 
-		System.out.println(
-				"Looks like we're ready to play. Here's the board. When it's your turn, input a column number to place a token.");
-		System.out.println();
+		System.out.println("Looks like we're ready to play. Here's the board.");
+		System.out.println("When it's your turn, input a column number to place a token.");
 		System.out.println();
 
 		gameController = new GameController(playerController, rows, columns);
 		gameController.play();
 
-		System.out.println();
-		System.out.println();
 		System.out.println("Thanks for playing!");
 
 		key.close();

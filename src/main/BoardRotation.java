@@ -1,4 +1,4 @@
-package connectFour;
+package main;
 
 public class BoardRotation {
 	static int columns;
@@ -7,8 +7,8 @@ public class BoardRotation {
 	static int[][] quarterRotatedBoardArray;
 
 	// Rotates the board clockwise
-	public static Board rotateCW(Board board) {
-		setUpVariables(board);
+	public static BoardController rotateCW(BoardController bc) {
+		setUpVariables(bc);
 
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < columns; col++) {
@@ -16,12 +16,12 @@ public class BoardRotation {
 			}
 		}
 
-		return new Board(quarterRotatedBoardArray);
+		return new BoardController(quarterRotatedBoardArray);
 	}
 
 	// Rotates the board counterclockwise
-	public static Board rotateCCW(Board board) {
-		setUpVariables(board);
+	public static BoardController rotateCCW(BoardController bc) {
+		setUpVariables(bc);
 
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < columns; col++) {
@@ -29,14 +29,14 @@ public class BoardRotation {
 			}
 		}
 
-		return new Board(quarterRotatedBoardArray);
+		return new BoardController(quarterRotatedBoardArray);
 	}
 
 	// Sets up variables
-	private static void setUpVariables(Board board) {
-		originalBoardArray = board.readBoard();
-		columns = board.width();
-		rows = board.height();
-		quarterRotatedBoardArray = new int[rows][columns];
+	private static void setUpVariables(BoardController bc) {
+		originalBoardArray = bc.readBoard();
+		columns = bc.width();
+		rows = bc.height();
+		quarterRotatedBoardArray = new int[columns][rows];
 	}
 }
