@@ -68,12 +68,8 @@ public class BoardController {
 
 	// Prints the board to the console
 	public void printBoard(PlayerController[] playerController) {
-		// Print board contents to look like this:
-		// Note: Eclipse auto-format doesn't keep leading spaces, hence ///
-		/// 1 2 3 4 5 6 7
-		// | | | | | | | |
-		// | | | | | | | |
-		// |1| |2|1|1|2| |
+		// Print leading line
+		System.out.println();
 
 		// Print column labels
 		for (int col = 0; col < columns; col++) {

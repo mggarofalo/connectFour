@@ -31,51 +31,35 @@ public class GameController {
 					+ playerController[turn].getPlayer().getToken() + "). Pick a column (1-" + boardController.width()
 					+ "): ");
 
-			// Handle the input
-			selectedColumn = Utilities.makeUserInputANumber() - 1;
+			// Get the input and try to move
+			tryMoveResponse = getInputAndTryToMove();
 
-			// Get and interpret the response
-			tryMoveResponse = handleTryMoveResponse(
-					boardController.tryMove(playerController[turn].getPlayer(), selectedColumn));
+			// Handle any errors
+			while (tryMoveResponse == -2 || tryMoveResponse == -3) {
+				if (tryMoveResponse == -2) {
+					System.out.print("Sorry, but that isn't a valid column selection. Try again: ");
+					tryMoveResponse = getInputAndTryToMove();
+				} else if (tryMoveResponse == -3) {
+					System.out.print("Sorry, but that column is full. Try again: ");
+					tryMoveResponse = getInputAndTryToMove();
+				}
+			}
 
-			if (tryMoveResponse == 1) {
-				// If the game is over, change the boolean so the program can exit
-				gameOver = true;
-			} else if (tryMoveResponse == 0) {
+			// Handle successful move
+			if (tryMoveResponse == 0) {
 				// If the move was valid, swap turns
 				incrementOrResetTurn();
+			} else if (tryMoveResponse == -1) {
+				// If there's a draw, let the players know
+				System.out.println("Looks like a draw to me. Game over, losers.");
+			} else {
+				// If the game is over, change the boolean so the program can exit
+				gameOver = true;
+				displayWinMessage(tryMoveResponse);
 			}
 
 		} while (!gameOver);
 
-	}
-
-	public int handleTryMoveResponse(int response) {
-		// The return value of this function is 0 for continue, -1 for retry, and 1 win
-		// or draw detected.
-		int retVal;
-
-		System.out.println();
-
-		if (response == 0) {
-			// Game continues
-			retVal = 0;
-		} else if (response == -3) {
-			System.out.println("Sorry, but that column is full.");
-			retVal = -1;
-		} else if (response == -2) {
-			System.out.println("Sorry, but that isn't a valid column selection.");
-			retVal = -1;
-		} else if (response == -1) {
-			System.out.println("Looks like a draw to me. Game over, losers.");
-			retVal = 1;
-		} else {
-			displayWinMessage(response);
-			retVal = 1;
-		}
-
-		System.out.println();
-		return retVal;
 	}
 
 	private void displayWinMessage(int winner) {
@@ -90,5 +74,10 @@ public class GameController {
 		} else {
 			turn += 1;
 		}
+	}
+
+	private int getInputAndTryToMove() {
+		int selectedColumn = Utilities.makeUserInputANumber() - 1;
+		return boardController.tryMove(playerController[turn].getPlayer(), selectedColumn);
 	}
 }
