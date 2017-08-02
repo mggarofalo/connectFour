@@ -25,9 +25,9 @@ Finds best move (stub). Reads the board directly. Most efficient method might be
 Validity check may be unnecessary.
 
 PlayerInterface
-  Takes console input and passes to board.
-  Displays message to player if the requested move is invalid.
-  Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win (2) or loss (3) message.
+X Takes console input and passes to board.
+X Displays message to player if the requested move is invalid.
+X Checks return value from board and passes play to the other player (0), displays tie message (1), or displays win (2) or loss (3) message.
 
 Board
 X Model is an int[rows][columns], where -1 means empty and 0 or 1 is player ID.
@@ -39,9 +39,9 @@ X Displays the board by iterating through the matrix and printing output to the 
 X Otherwise returns (0) to the player.
 
 Game
-  Keeps track of current turn.
+X Keeps track of current turn.
 X Checks for a win or tie. If the game is over, returns tie (-1) or win (player ID + 1) to the player. Otherwise returns 0 and the game continues.
-  Calls player action (listener for human, decision method for AI).
+X Calls player action (listener for human, decision method for AI).
 
 MoveLog
 X Model is an ArrayList of BoardMoves. BoardMoves contain a a date and time (java.util.Date), a player ID (0 or 1), and a BoardSquare<c, r>.
