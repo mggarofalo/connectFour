@@ -7,9 +7,9 @@ public class GameController {
 	private int turn;
 	private boolean gameOver = false;
 
-	public GameController(PlayerController[] playerController, int rows, int columns) {
+	public GameController(PlayerController[] playerController, int rows, int columns, int winLength) {
 		this.playerController = playerController;
-		this.boardController = new BoardController(rows, columns);
+		this.boardController = new BoardController(rows, columns, winLength);
 		this.turn = pickFirstPlayer();
 	}
 
@@ -20,14 +20,13 @@ public class GameController {
 
 	public void play() {
 		do {
-			int selectedColumn;
 			int tryMoveResponse;
 
 			// Print the board
 			boardController.printBoard(playerController);
 
 			// Print the prompt
-			System.out.print("Your turn, " + playerController[turn].getPlayer().getName() + " ("
+			Utilities.print("Your turn, " + playerController[turn].getPlayer().getName() + " ("
 					+ playerController[turn].getPlayer().getToken() + "). Pick a column (1-" + boardController.width()
 					+ "): ");
 
@@ -37,10 +36,10 @@ public class GameController {
 			// Handle any errors
 			while (tryMoveResponse == -2 || tryMoveResponse == -3) {
 				if (tryMoveResponse == -2) {
-					System.out.print("Sorry, but that isn't a valid column selection. Try again: ");
+					Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
 					tryMoveResponse = getInputAndTryToMove();
 				} else if (tryMoveResponse == -3) {
-					System.out.print("Sorry, but that column is full. Try again: ");
+					Utilities.print("Sorry, but that column is full. Try again: ");
 					tryMoveResponse = getInputAndTryToMove();
 				}
 			}
@@ -51,7 +50,7 @@ public class GameController {
 				incrementOrResetTurn();
 			} else if (tryMoveResponse == -1) {
 				// If there's a draw, let the players know
-				System.out.println("Looks like a draw to me. Game over, losers.");
+				Utilities.println("Looks like a draw to me. Game over, losers.");
 			} else {
 				// If the game is over, change the boolean so the program can exit
 				gameOver = true;
@@ -64,8 +63,8 @@ public class GameController {
 
 	private void displayWinMessage(int winner) {
 		boardController.printBoard(playerController);
-		System.out.println();
-		System.out.println("Congratulations on your win, " + playerController[winner - 1].getPlayer().getName() + "!");
+		Utilities.println();
+		Utilities.println("Congratulations on your win, " + playerController[winner - 1].getPlayer().getName() + "!");
 	}
 
 	private void incrementOrResetTurn() {
@@ -77,7 +76,7 @@ public class GameController {
 	}
 
 	private int getInputAndTryToMove() {
-		int selectedColumn = Utilities.makeUserInputANumber() - 1;
+		int selectedColumn = Utilities.makeUserInputAPositiveNumber() - 1;
 		return boardController.tryMove(playerController[turn].getPlayer(), selectedColumn);
 	}
 }

@@ -2,8 +2,6 @@ package main;
 
 public class BoardIterator {
 
-	private static int winLength = 4;
-
 	private static BoardController boardController;
 	private static BoardSquare checkSquare;
 
@@ -19,10 +17,10 @@ public class BoardIterator {
 			for (int col = 0; col < boardController.width(); col++) {
 
 				// Check vertical
-				if (row <= (boardController.height() - winLength)) {
-					Object[] squares = new Object[winLength];
+				if (row <= (boardController.height() - boardController.winLength())) {
+					Object[] squares = new Object[boardController.winLength()];
 					checkSquare = new BoardSquare(row, col);
-					for (int i = 0; i < winLength; i++) {
+					for (int i = 0; i < boardController.winLength(); i++) {
 						squares[i] = readAndMove("S");
 					}
 					if (Utilities.allAreEqual(squares) && (int) squares[0] != -1) {
@@ -31,10 +29,10 @@ public class BoardIterator {
 				}
 
 				// Check horizontal
-				if (col <= (boardController.width() - winLength)) {
-					Object[] squares = new Object[winLength];
+				if (col <= (boardController.width() - boardController.winLength())) {
+					Object[] squares = new Object[boardController.winLength()];
 					checkSquare = new BoardSquare(row, col);
-					for (int i = 0; i < winLength; i++) {
+					for (int i = 0; i < boardController.winLength(); i++) {
 						squares[i] = readAndMove("E");
 					}
 					if (Utilities.allAreEqual(squares) && (int) squares[0] != -1) {
@@ -44,11 +42,11 @@ public class BoardIterator {
 
 				// Check descending
 				// 4,5
-				if (row < (boardController.height() - winLength + 1)
-						&& (col < boardController.width() - winLength + 1)) {
-					Object[] squares = new Object[winLength];
+				if (row < (boardController.height() - boardController.winLength() + 1)
+						&& (col < boardController.width() - boardController.winLength() + 1)) {
+					Object[] squares = new Object[boardController.winLength()];
 					checkSquare = new BoardSquare(row, col);
-					for (int i = 0; i < winLength; i++) {
+					for (int i = 0; i < boardController.winLength(); i++) {
 						squares[i] = readAndMove("SE");
 					}
 					if (Utilities.allAreEqual(squares) && (int) squares[0] != -1) {
@@ -57,10 +55,11 @@ public class BoardIterator {
 				}
 
 				// Check ascending (NOT CONFIRMED)
-				if (row >= winLength && (col < boardController.width() - winLength + 1)) {
-					Object[] squares = new Object[winLength];
+				if (row >= boardController.winLength()
+						&& (col < boardController.width() - boardController.winLength() + 1)) {
+					Object[] squares = new Object[boardController.winLength()];
 					checkSquare = new BoardSquare(row, col);
-					for (int i = 0; i < winLength; i++) {
+					for (int i = 0; i < boardController.winLength(); i++) {
 						squares[i] = readAndMove("NE");
 					}
 					if (Utilities.allAreEqual(squares) && (int) squares[0] != -1) {

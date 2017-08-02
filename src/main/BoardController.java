@@ -12,21 +12,24 @@ public class BoardController {
 
 	private final int rows;
 	private final int columns;
+	private final int winLength;
 	private Board board;
 	private BoardMoveLog log;
 
 	// Initialize a game
-	public BoardController(int rowTotal, int columnTotal) {
+	public BoardController(int rowTotal, int columnTotal, int winLength) {
 		this.rows = rowTotal;
 		this.columns = columnTotal;
+		this.winLength = winLength;
 		board = new Board(this.rows, this.columns);
 		log = new BoardMoveLog();
 	}
 
 	// Initialize a game
-	public BoardController(int[][] boardArray) {
+	public BoardController(int[][] boardArray, int winLength) {
 		rows = boardArray.length;
 		columns = boardArray[0].length;
+		this.winLength = winLength;
 		board = new Board(this.rows, this.columns);
 		log = new BoardMoveLog();
 	}
@@ -35,6 +38,7 @@ public class BoardController {
 	public BoardController(BoardController boardController) {
 		rows = boardController.rows;
 		columns = boardController.columns;
+		winLength = boardController.winLength;
 		board = boardController.board;
 		log = boardController.log;
 	}
@@ -47,6 +51,11 @@ public class BoardController {
 	// Returns the width of the board
 	public int width() {
 		return columns;
+	}
+
+	// Returns the number of tokens needed in a row to win
+	public int winLength() {
+		return winLength;
 	}
 
 	// The board is private so that only the BoardController class can write to it.
@@ -69,43 +78,44 @@ public class BoardController {
 	// Prints the board to the console
 	public void printBoard(PlayerController[] playerController) {
 		// Print leading line
-		System.out.println();
+		Utilities.print("");
 
 		// Print column labels
 		for (int col = 0; col < columns; col++) {
-			System.out.print(" ");
+			Utilities.print(" ");
 
 			// Print the column header. If we're done, print a new line.
-			if (col == (columns - 1)) {
-				System.out.println(Utilities.padString(String.valueOf(col + 1), " ", String.valueOf(columns).length()));
-			} else {
-				System.out.print(Utilities.padString(String.valueOf(col + 1), " ", String.valueOf(columns).length()));
-			}
+			Utilities.print(
+					Utilities.padString(String.valueOf(col + 1), " ",
+							String.valueOf(columns).length() + 1 - String.valueOf(col + 1).length()),
+					(col == (columns - 1)));
 		}
 
 		// Loop through rows
 		for (int row = 0; row < rows; row++) {
 			// Initial border
-			System.out.print("|");
+			Utilities.print("|");
 
 			// Loop through columns in row
 			for (int col = 0; col < columns; col++) {
 				// Print blank space if the space is empty; otherwise print the player number.
 				if (board.boardArray[row][col] == -1) {
-					System.out.print(Utilities.padString(" ", null,
-							String.valueOf(columns).length() + 1 - String.valueOf(col + 1).length()));
+					Utilities.print(Utilities.padString(" ", null, String.valueOf(columns).length()));
 				} else {
-					System.out.print(
-							Utilities.padString(playerController[board.boardArray[row][col]].getPlayer().getToken(),
-									" ", String.valueOf(columns).length()));
+					Utilities
+							.print(Utilities
+									.padString(playerController[board.boardArray[row][col]].getPlayer().getToken(), " ",
+											String.valueOf(columns).length() + 1 - String.valueOf(
+													playerController[board.boardArray[row][col]].getPlayer().getToken())
+													.length()));
 				}
 
 				// Dividing border
-				System.out.print("|");
+				Utilities.print("|");
 			}
 
 			// End the row and loop again
-			System.out.println();
+			Utilities.println();
 		}
 	}
 

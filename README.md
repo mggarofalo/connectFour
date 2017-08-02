@@ -32,7 +32,7 @@ The moves will be stored in a List and, ideally, synced to a RDB. The program wi
 - [X] Finds the lowest open row in the given column.
 - [X] Displays the board by iterating through the matrix and printing output to the console.
 - [X] Otherwise returns (0) to the player.
-- [ ] Fix formatting for 10+ columns.
+- [X] Fix formatting for 10+ columns.
 
 #### Game
 - [X] Keeps track of current turn.
