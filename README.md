@@ -1,29 +1,23 @@
 # connectFour
 ## Connect Four game (test project)
 
-** This is a test project. This readme will be updated with various notes and progress markers as I go through, including a to-do list and project outline. **
+**This is a test project. This readme will be updated with various notes and progress markers as I go through, including a to-do list and project outline.**
 
 ## About
 Connect Four is played on a 7x6 board. This program will take player and computer input, visually represent the game board in console output, track the moves, and identify wins.
 
 The moves will be stored in a List and, ideally, synced to a RDB. The program will be able identify danger and, ideally, strategic opportunities to allow the computer opponent to play intelligently, but I'm not 100% sure I can make that last part happen, given my limited knowledge of Connect Four strategy. I'll see what I can do.
 
-Level 1: Playable Connect Four game with 2 players, a command line interface, and win/tie detection.
-Level 2: "AI" for a computer player that blocks (closes a half-open three and half-closes an open two) when possible or else plays on its longest playable run.
-Level 3: Learn how to make a single-page application backed by Java. Learn how to host a SPA. Connect to a free RDB and sync the move object, delivering hash snippet for game identification and resumption. Perhaps allow login and win percentage tracking as well.
-Boss Level: I probably won't be able to do this because I don't think I'll have time to read the giant Connect Four Masters Thesis linked from Wikipedia. Having said that, it looks really interesting.
-
-
 ## Component List
 
 #### Initial variables
-- Board size (default 7c6r, but there's no reason that couldn't be altered)
+- Board size (default 7c6r, but there's no reason that couldn't be altered). Note: it's been altered. Any size board, although the formatting is still a little weird.
 - Level 1/2: Human/AI selector for P1 and P2 (the player will be a controller and its input will come from the command line or from a decision engine of some kind); in this case, we will also initialize first player selection
 - Boss: Difficulty selector for each AI that governs whether it plays randomly except to block
 	
 #### Level 2: AIPlayer (stub)
-- Finds best move (stub). Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously.
-- Validity check may be unnecessary.
+- Finds best move (stub).
+- Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously. Validity check may be unnecessary in this case.
 
 #### PlayerInterface
 - [X] Takes console input and passes to board.
@@ -38,6 +32,7 @@ Boss Level: I probably won't be able to do this because I don't think I'll have 
 - [X] Finds the lowest open row in the given column.
 - [X] Displays the board by iterating through the matrix and printing output to the console.
 - [X] Otherwise returns (0) to the player.
+- [ ] Fix formatting for 10+ columns.
 
 #### Game
 - [X] Keeps track of current turn.
