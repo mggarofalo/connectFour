@@ -9,6 +9,10 @@ public class BoardChecker {
 	private static BoardController boardController;
 	private static int[] winner = new int[4];
 
+	public static BoardSquare[] checkForThreats(BoardController bc, BoardSquare square) {
+		return new BoardSquare[] { new BoardSquare(0, 0), new BoardSquare(0, 0) };
+	}
+
 	public static boolean isWinningMove(BoardController bc, BoardSquare square) {
 		dir = setUpDirectionArray(true);
 		boardController = bc;
@@ -54,7 +58,7 @@ public class BoardChecker {
 	}
 
 	public static int checkForDraw(BoardController bc) {
-		if (bc.readLog().readMoves().size() == (bc.width() * bc.height())) {
+		if (bc.readLog().getMoves().size() == (bc.width() * bc.height())) {
 			return 0;
 		} else {
 			// Iterate through the board to see if there are possible wins. If so, return 0.

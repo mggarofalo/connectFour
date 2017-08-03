@@ -19,7 +19,11 @@ public class BoardSquare {
 	}
 
 	public String coordinates() {
-		return row + "," + col;
+		return new String(row + "," + col);
+	}
+
+	public String coordinatesReadable() {
+		return new String("row " + (row + 1) + ", column " + (col + 1));
 	}
 
 	public void move(String direction) {

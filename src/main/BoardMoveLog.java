@@ -13,18 +13,50 @@ import java.util.Date;
 // method in the Game class to rebuild the board according to the move log.
 
 public class BoardMoveLog {
-	// Each member of this ArrayList is an Object[3].
-	// 0 is the date and time, 1 is the player (1 or 2), and
-	// 2 is the BoardSquare instance representing row and column.
-	// The ArrayList will naturally be in chronological order.
 	private ArrayList<BoardMove> moves = new ArrayList<BoardMove>();
 
+	// Takes a player and BoardSquare and adds them to the ArrayList.
 	public void addMove(Player player, BoardSquare move) {
-		// Takes a player and BoardSquare and adds them to the ArrayList.
 		moves.add(new BoardMove(new Date(), player, move));
 	}
 
-	public ArrayList<BoardMove> readMoves() {
+	// Gets an ArrayList of all the moves
+	public ArrayList<BoardMove> getMoves() {
 		return moves;
+	}
+
+	// Gets the most recent move
+	public BoardMove getLastMove() {
+		return moves.get(moves.size() - 1);
+	}
+
+	// Gets the move n moves prior to the most recent move
+	public BoardMove getLastMove(int n) {
+		return moves.get(moves.size() - 1 - n);
+	}
+
+	// Gets an ArrayList of all the AI moves after the last human move
+	public ArrayList<BoardMove> getLastAIMoves() {
+		if (moves.size() == 0 || getLastMove().getPlayer().isHuman()) {
+			// Return an empty ArrayList
+			return new ArrayList<BoardMove>();
+		} else {
+			ArrayList<BoardMove> movesByAI = new ArrayList<BoardMove>();
+
+			// Get the index of the first AI move after the last human move
+			for (int i = (moves.size() - 1); i >= 0; i--) {
+				if (moves.get(i).getPlayer().isHuman()) {
+					// Add all the subsequent moves to the ArrayList
+					for (int j = (i + 1); i < moves.size(); i++) {
+						movesByAI.add(moves.get(j));
+					}
+
+					break;
+				}
+			}
+
+			// Return the list of AI moves
+			return movesByAI;
+		}
 	}
 }

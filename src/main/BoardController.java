@@ -1,20 +1,12 @@
 package main;
 
 public class BoardController {
-	/*
-	 * Method list: + pickFirstPlayer generates a random player order + readBoard
-	 * returns the current board state for AI reading + readLog returns the game log
-	 * for AI reading + tryMove takes a player ID and column ID and returns a
-	 * success value + makeMove updates the board and logs the move +
-	 * checkForWinOrDraw runs checkForWin and checkForDraw and return continue (0),
-	 * draw (-1), or winning player ID
-	 */
 
 	private final int winLength;
 	private Board board;
 	private BoardMoveLog log;
 
-	// Initialize a game with dimensions
+	// Initializes a game with dimensions
 	public BoardController(int rows, int columns, int winLength) {
 		this.winLength = winLength;
 
@@ -32,21 +24,7 @@ public class BoardController {
 		log = new BoardMoveLog();
 	}
 
-	// Initialize a game
-	public BoardController(int[][] boardArray, int winLength) {
-		this.winLength = winLength;
-		board = new Board(boardArray);
-		log = new BoardMoveLog();
-	}
-
-	// Initialize a game
-	public BoardController(BoardController boardController) {
-		winLength = boardController.winLength;
-		board = boardController.board;
-		log = boardController.log;
-	}
-
-	// Return the height of the board
+	// Returns the height of the board
 	public int height() {
 		return board.height();
 	}
@@ -61,24 +39,18 @@ public class BoardController {
 		return winLength;
 	}
 
-	// The board is private so that only the BoardController class can write to it.
-	// However, so that the AI can read it, we have a read method.
-	public int[][] readBoard() {
-		return board.boardArray;
-	}
-
 	// Returns the contents of a given BoardSquare
 	public int readBoardSquare(BoardSquare square) {
 		return board.boardArray[square.row()][square.col()];
 	}
 
-	// Same as above with the log. This will be necessary when implementing advanced
-	// AI strategy, since it will be necessary to see the opponent's previous play.
+	// Same as above with the log. This will be necessary when implementing AI
+	// strategy, since it will be necessary to see the opponent's previous play.
 	public BoardMoveLog readLog() {
 		return log;
 	}
 
-	// Prints the board to the console
+	// Print the board to the console
 	public void printBoard(PlayerController[] playerController) {
 		// Print leading line
 		Utilities.print("");
@@ -124,17 +96,27 @@ public class BoardController {
 
 	// Takes a player ID and column to log.
 	public int tryMove(Player player, int col) {
-		// If the column isn't valid, return -2
+		// If the column isn't valid, throw an AI exception or return -2
 		if (col < 0 || col >= board.width()) {
-			return -2;
+			if (!player.isHuman()) {
+				throw new IllegalArgumentException(
+						"An AI player just tried to move in column " + col + ", which is not valid.");
+			} else {
+				return -2;
+			}
 		}
 
 		// Get the lowest row now so we only have to get it once per move attempt
 		int lowestRow = getLowestRow(col);
 
-		// If the column is full, return -3
+		// If the column is full, throw an AI exception or return -3
 		if (lowestRow == -1) {
-			return -3;
+			if (!player.isHuman()) {
+				throw new IllegalArgumentException(
+						"An AI player just tried to move in column " + col + ", which is full.");
+			} else {
+				return -3;
+			}
 		}
 
 		// First, convert the column to a move.
@@ -160,7 +142,7 @@ public class BoardController {
 	}
 
 	// Takes a player ID and move to log and add to the board
-	private void makeMove(Player player, BoardSquare move) {
+	public void makeMove(Player player, BoardSquare move) {
 		log.addMove(player, move);
 		board.boardArray[move.row()][move.col()] = player.getIndex();
 	}

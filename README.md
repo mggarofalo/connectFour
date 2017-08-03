@@ -16,8 +16,11 @@ The moves will be stored in a List and, ideally, synced to a RDB. The program wi
 - Boss: Difficulty selector for each AI that governs whether it plays randomly except to block
 	
 #### Level 2: AIPlayer (stub)
-- Finds best move (stub).
-- Reads the board directly. Most efficient method might be to assess the available moves and check them in order of strength for validity, executing the first valid one. This is where my lack of knowledge about Connect Four strategy will show up most obviously. Validity check may be unnecessary in this case.
+- [ ] Checks for threats from all moves since its last turn.
+- [ ] Find the move that will make the longest line where four are possible.
+- [ ] If no such move is possible, try playing adjacent to a single opponent token where four are possible.
+- [ ] If no such move is possible, try playing in a random open space where four are possible.
+- [ ] If no such move is possible, play in a random open space.
 
 #### PlayerInterface
 - [X] Takes console input and passes to board.

@@ -8,10 +8,10 @@ public class BoardMove {
 	private final Player player;
 	private final BoardSquare move;
 
-	public BoardMove(Date aDate, Player aPlayer, BoardSquare aMove) {
-		date = aDate;
-		player = aPlayer;
-		move = aMove;
+	public BoardMove(Date date, Player player, BoardSquare move) {
+		this.date = date;
+		this.player = player;
+		this.move = move;
 	}
 
 	public Date getDate() {

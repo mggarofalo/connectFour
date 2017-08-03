@@ -5,16 +5,18 @@ import java.util.Random;
 
 public class ConnectFour {
 
+	static int columns = 7; // Default value
+	static int rows = 6; // Default value
+	static int winLength = 4; // Default value
+	static int players = 2; // Default value
+
+	static Scanner key = new Scanner(System.in);
 	public static Random rand = new Random();
-	static int columns = 7;
-	static int rows = 6;
-	static int winLength = 4;
-	static int players = 2;
+
 	static String[] name = new String[players];
 	static String[] token = new String[players];
 	static PlayerController[] playerController = new PlayerController[players];
 	static GameController gameController;
-	static Scanner key = new Scanner(System.in);
 
 	public static void main(String[] args) {
 		Utilities.println("Welcome to Connect Four!");
@@ -28,6 +30,7 @@ public class ConnectFour {
 
 	private static void setUpGame() {
 		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "N" }, "choice", false);
+
 		if (choice.equalsIgnoreCase("N")) {
 			Utilities.print("How many players are there? ");
 			players = Utilities.makeUserInputAPositiveNumber();
@@ -45,11 +48,19 @@ public class ConnectFour {
 			winLength = Utilities.makeUserInputAPositiveNumberSmallerThanArrayMax(new int[] { rows, columns });
 		}
 
+		// Ask for players' names and tokens
 		setUpPlayers();
 
+		// Show game instructions
+		printInstructions();
+
+		// Initialize the game controller
 		gameController = new GameController(playerController, rows, columns, winLength);
+
+		// Start the game
 		gameController.play();
 
+		// When a winner is found, gameController.play() exits and we display a message
 		Utilities.println("Thanks for playing!");
 	}
 
@@ -64,8 +75,6 @@ public class ConnectFour {
 
 			playerController[i] = new PlayerController(name[i], token[i], i, true);
 		}
-
-		printInstructions();
 	}
 
 	private static void printInstructions() {

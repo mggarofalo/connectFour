@@ -9,6 +9,7 @@ public class Utilities {
 
 	// Region "Evaluators"
 
+	// Checks to see whether all values in a given array are equal
 	public static boolean allAreEqual(Object[] o) {
 		Object val = o[0];
 
@@ -23,6 +24,7 @@ public class Utilities {
 		return true;
 	}
 
+	// Checks to see whether a given string can be parsed to an integer
 	public static boolean isInteger(String input) {
 		try {
 			Integer.parseInt(input);
@@ -32,10 +34,14 @@ public class Utilities {
 		}
 	}
 
+	// Checks to see whether a given string exists in a given array (defaults to
+	// case-sensitive)
 	public static boolean stringExistsInStringArray(String[] values, String toFind) {
 		return stringExistsInStringArray(values, toFind, true);
 	}
 
+	// Checks to see whether a given string exists in a given array (case-sensitive
+	// optional)
 	public static boolean stringExistsInStringArray(String[] values, String toFind, boolean caseSensitive) {
 		for (int i = 0; i < values.length; i++) {
 			if (caseSensitive && toFind.equals(values[i])) {
@@ -48,6 +54,7 @@ public class Utilities {
 		return false;
 	}
 
+	// Checks to see whether an int is larger than any int in a given array
 	public static boolean intBiggerThanIntsInArray(int value, int[] values) {
 		for (int i = 0; i < values.length; i++) {
 			if (value > values[i]) {
@@ -62,6 +69,8 @@ public class Utilities {
 
 	// Region "Input Parsers"
 
+	// Sanitizes input to ensure that an integer is smaller than the largest of a
+	// set of ints
 	public static int makeUserInputAPositiveNumberSmallerThanArrayMax(int[] values) {
 		int input = makeUserInputAPositiveNumber();
 		int maxPermitted = 0;
@@ -80,28 +89,34 @@ public class Utilities {
 		return input;
 	}
 
+	// Sanitizes input to ensure that the int is positive and non-zero
 	public static int makeUserInputAPositiveNumber() {
 		String input = key.next();
 
 		while (!isInteger(input) || Integer.parseInt(input) <= 0) {
-			Utilities.print("Please provide a positive, non-zero number: ", false);
+			Utilities.print("Please provide a positive, non-zero number. Try again: ", false);
 			input = key.next();
 		}
 
 		return Integer.parseInt(input);
 	}
 
+	// Sanitizes input to ensure that a given string does not already exist in a
+	// given array (case-sensitive optional)
 	public static String makeUserInputStringFromArray(String[] values, String inputName, boolean caseSensitive) {
 		String input = key.nextLine();
 
 		while (!stringExistsInStringArray(values, input, caseSensitive)) {
-			Utilities.print("That " + inputName + " is not valid. Try again: ", false);
+			Utilities.print("That " + inputName + " is already taken. Try again: ", false);
 			input = key.nextLine();
 		}
 
 		return input;
 	}
 
+	// Sanitizes input to ensure that a given string does not exceed an optional
+	// length threshold, does not already exist in a given array, and is not
+	// entirely whitespace characters
 	public static String makeUserInputUniqueString(String[] values, String inputName, Integer length,
 			boolean requireNonWhiteSpace) {
 		String input = key.nextLine();
@@ -127,7 +142,7 @@ public class Utilities {
 
 		// Third error should be if it's the right length and unique but contains
 		// whitespace.
-		if (requireNonWhiteSpace && input.replaceAll("\\s+", "").length() != input.length()) {
+		if (requireNonWhiteSpace && input.replaceAll("\\s+", "").length() == 0) {
 			Utilities.print("Sorry, but you can't use whitespace characters. Try again: ", false);
 			input = makeUserInputUniqueString(values, inputName, length, requireNonWhiteSpace);
 		}
@@ -139,6 +154,7 @@ public class Utilities {
 
 	// Region "String Manipulation"
 
+	// Pads a string to a given length with a given character (or itself)
 	public static String padString(String s, String padChar, int length) {
 		for (int i = 1; i < length; i++) {
 			if (padChar == null) {
@@ -154,6 +170,8 @@ public class Utilities {
 	// End Region
 
 	// Region "System Modifications"
+	// All functions in this region offer slightly more helpful versions of the
+	// System.out.print() and System.out.println methods
 
 	public static void print() {
 		print("", false);
