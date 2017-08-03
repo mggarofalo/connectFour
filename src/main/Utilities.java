@@ -48,9 +48,37 @@ public class Utilities {
 		return false;
 	}
 
+	public static boolean intBiggerThanIntsInArray(int value, int[] values) {
+		for (int i = 0; i < values.length; i++) {
+			if (value > values[i]) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// End Region
 
 	// Region "Input Parsers"
+
+	public static int makeUserInputAPositiveNumberSmallerThanArrayMax(int[] values) {
+		int input = makeUserInputAPositiveNumber();
+		int maxPermitted = 0;
+
+		for (int i = 0; i < values.length; i++) {
+			if (i > maxPermitted) {
+				maxPermitted = i;
+			}
+		}
+
+		while (intBiggerThanIntsInArray(input, values)) {
+			Utilities.print("That number is too large. The maximum permitted is " + maxPermitted + ". Try again: ");
+			input = makeUserInputAPositiveNumber();
+		}
+
+		return input;
+	}
 
 	public static int makeUserInputAPositiveNumber() {
 		String input = key.next();
@@ -135,12 +163,20 @@ public class Utilities {
 		print(s, false);
 	}
 
+	public static void print(boolean b) {
+		print((b ? "true" : "false"), false);
+	}
+
 	public static void println() {
 		print("", true);
 	}
 
 	public static void println(String s) {
 		print(s, true);
+	}
+
+	public static void println(boolean b) {
+		print((b ? "true" : "false"), true);
 	}
 
 	public static void print(String s, boolean newLine) {

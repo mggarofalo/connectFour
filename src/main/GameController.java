@@ -1,82 +1,97 @@
 package main;
 
 public class GameController {
-
-	private PlayerController[] playerController;
-	private BoardController boardController;
-	private int turn;
-	private boolean gameOver = false;
+	private Game game;
+	private String prompt;
 
 	public GameController(PlayerController[] playerController, int rows, int columns, int winLength) {
-		this.playerController = playerController;
-		this.boardController = new BoardController(rows, columns, winLength);
-		this.turn = pickFirstPlayer();
-	}
-
-	private int pickFirstPlayer() {
-		Double rand = Math.random() * playerController.length;
-		return rand.intValue();
+		game = new Game(playerController, rows, columns, winLength);
 	}
 
 	public void play() {
 		do {
 			int tryMoveResponse;
 
-			// Print the board
-			boardController.printBoard(playerController);
+			// Set up the prompt so that we can measure it for the spacer
+			prompt = "Your turn, " + game.getCurrentPlayerName() + " (" + game.getCurrentPlayerToken()
+					+ "). Pick a column (1-" + game.boardController.width() + "): ";
+
+			// Print the space and new board
+			printSpacer(prompt, "-");
+			game.boardController.printBoard(game.playerController);
 
 			// Print the prompt
-			Utilities.print("Your turn, " + playerController[turn].getPlayer().getName() + " ("
-					+ playerController[turn].getPlayer().getToken() + "). Pick a column (1-" + boardController.width()
-					+ "): ");
+			Utilities.print(prompt);
 
 			// Get the input and try to move
-			tryMoveResponse = getInputAndTryToMove();
-
-			// Handle any errors
-			while (tryMoveResponse == -2 || tryMoveResponse == -3) {
-				if (tryMoveResponse == -2) {
-					Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
-					tryMoveResponse = getInputAndTryToMove();
-				} else if (tryMoveResponse == -3) {
-					Utilities.print("Sorry, but that column is full. Try again: ");
-					tryMoveResponse = getInputAndTryToMove();
-				}
-			}
+			tryMoveResponse = handleTryMoveErrors(getInputAndTryToMove());
 
 			// Handle successful move
-			if (tryMoveResponse == 0) {
-				// If the move was valid, swap turns
-				incrementOrResetTurn();
-			} else if (tryMoveResponse == -1) {
-				// If there's a draw, let the players know
-				Utilities.println("Looks like a draw to me. Game over, losers.");
-			} else {
-				// If the game is over, change the boolean so the program can exit
-				gameOver = true;
-				displayWinMessage(tryMoveResponse);
-			}
+			game.gameOver = handleSuccessfulMove(tryMoveResponse);
 
-		} while (!gameOver);
+		} while (!game.gameOver);
 
 	}
 
-	private void displayWinMessage(int winner) {
-		boardController.printBoard(playerController);
-		Utilities.println();
-		Utilities.println("Congratulations on your win, " + playerController[winner - 1].getPlayer().getName() + "!");
-	}
-
-	private void incrementOrResetTurn() {
-		if (turn == (playerController.length - 1)) {
-			turn = 0;
-		} else {
-			turn += 1;
+	private void printSpacer(String s, String c) {
+		for (int i = 0; i < (s.length() + String.valueOf(game.boardController.width() - 1).length()); i++) {
+			Utilities.print(c);
 		}
+		Utilities.println();
 	}
 
 	private int getInputAndTryToMove() {
 		int selectedColumn = Utilities.makeUserInputAPositiveNumber() - 1;
-		return boardController.tryMove(playerController[turn].getPlayer(), selectedColumn);
+		return game.boardController.tryMove(game.getCurrentPlayer(), selectedColumn);
+	}
+
+	private int handleTryMoveErrors(int tryMoveResponse) {
+		while (isInvalidMove(tryMoveResponse)) {
+			if (tryMoveResponse == -2) {
+				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
+			} else if (tryMoveResponse == -3) {
+				Utilities.print("Sorry, but that column is full. Try again: ");
+			}
+
+			tryMoveResponse = getInputAndTryToMove();
+		}
+
+		return tryMoveResponse;
+	}
+
+	private boolean isInvalidMove(int tryMoveResponse) {
+		return (tryMoveResponse == -2 || tryMoveResponse == -3);
+	}
+
+	private boolean handleSuccessfulMove(int tryMoveResponse) {
+		if (tryMoveResponse == 0) {
+			// If the move was valid, swap turns
+			incrementOrResetTurn();
+		} else if (tryMoveResponse == -1) {
+			// If there's a draw, let the players know
+			Utilities.println("Looks like a draw to me. Game over, losers.");
+		} else {
+			// If the game is over, change the boolean so the program can exit
+			game.gameOver = true;
+			displayWinMessage(tryMoveResponse);
+		}
+
+		return game.gameOver;
+	}
+
+	private void incrementOrResetTurn() {
+		if (game.turn == (game.playerController.length - 1)) {
+			game.turn = 0;
+		} else {
+			game.turn += 1;
+		}
+	}
+
+	private void displayWinMessage(int winner) {
+		printSpacer(prompt, "=");
+		Utilities.println();
+		game.boardController.printBoard(game.playerController);
+		Utilities.println();
+		Utilities.println("Congratulations on your win, " + game.getCurrentPlayerName() + "!");
 	}
 }

@@ -29,20 +29,20 @@ public class ConnectFour {
 	private static void setUpGame() {
 		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "N" }, "choice", false);
 		if (choice.equalsIgnoreCase("N")) {
-			Utilities.println("How many players are there? ");
+			Utilities.print("How many players are there? ");
 			players = Utilities.makeUserInputAPositiveNumber();
 			name = new String[players];
 			token = new String[players];
 			playerController = new PlayerController[players];
 
-			Utilities.print("How many columns would you like? ");
-			columns = Utilities.makeUserInputAPositiveNumber();
-
 			Utilities.print("How many rows would you like? ");
 			rows = Utilities.makeUserInputAPositiveNumber();
 
+			Utilities.print("How many columns would you like? ");
+			columns = Utilities.makeUserInputAPositiveNumber();
+
 			Utilities.print("And how many tokens in a row should be required to win? ");
-			winLength = Utilities.makeUserInputAPositiveNumber();
+			winLength = Utilities.makeUserInputAPositiveNumberSmallerThanArrayMax(new int[] { rows, columns });
 		}
 
 		setUpPlayers();

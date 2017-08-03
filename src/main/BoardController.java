@@ -10,34 +10,37 @@ public class BoardController {
 	 * draw (-1), or winning player ID
 	 */
 
-	private final int rows;
-	private final int columns;
 	private final int winLength;
 	private Board board;
 	private BoardMoveLog log;
 
-	// Initialize a game
-	public BoardController(int rowTotal, int columnTotal, int winLength) {
-		this.rows = rowTotal;
-		this.columns = columnTotal;
+	// Initialize a game with dimensions
+	public BoardController(int rows, int columns, int winLength) {
 		this.winLength = winLength;
-		board = new Board(this.rows, this.columns);
+
+		// Convert row/column counts to an in[][]
+		int[][] boardArray = new int[rows][columns];
+
+		// Set initial values to empty (-1)
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < columns; col++) {
+				boardArray[row][col] = -1;
+			}
+		}
+
+		board = new Board(boardArray);
 		log = new BoardMoveLog();
 	}
 
 	// Initialize a game
 	public BoardController(int[][] boardArray, int winLength) {
-		rows = boardArray.length;
-		columns = boardArray[0].length;
 		this.winLength = winLength;
-		board = new Board(this.rows, this.columns);
+		board = new Board(boardArray);
 		log = new BoardMoveLog();
 	}
 
 	// Initialize a game
 	public BoardController(BoardController boardController) {
-		rows = boardController.rows;
-		columns = boardController.columns;
 		winLength = boardController.winLength;
 		board = boardController.board;
 		log = boardController.log;
@@ -45,12 +48,12 @@ public class BoardController {
 
 	// Return the height of the board
 	public int height() {
-		return rows;
+		return board.height();
 	}
 
 	// Returns the width of the board
 	public int width() {
-		return columns;
+		return board.width();
 	}
 
 	// Returns the number of tokens needed in a row to win
@@ -81,31 +84,31 @@ public class BoardController {
 		Utilities.print("");
 
 		// Print column labels
-		for (int col = 0; col < columns; col++) {
+		for (int col = 0; col < board.width(); col++) {
 			Utilities.print(" ");
 
 			// Print the column header. If we're done, print a new line.
 			Utilities.print(
 					Utilities.padString(String.valueOf(col + 1), " ",
-							String.valueOf(columns).length() + 1 - String.valueOf(col + 1).length()),
-					(col == (columns - 1)));
+							String.valueOf(board.width()).length() + 1 - String.valueOf(col + 1).length()),
+					(col == (board.width() - 1)));
 		}
 
 		// Loop through rows
-		for (int row = 0; row < rows; row++) {
+		for (int row = 0; row < board.height(); row++) {
 			// Initial border
 			Utilities.print("|");
 
 			// Loop through columns in row
-			for (int col = 0; col < columns; col++) {
+			for (int col = 0; col < board.width(); col++) {
 				// Print blank space if the space is empty; otherwise print the player number.
 				if (board.boardArray[row][col] == -1) {
-					Utilities.print(Utilities.padString(" ", null, String.valueOf(columns).length()));
+					Utilities.print(Utilities.padString(" ", null, String.valueOf(board.width()).length()));
 				} else {
 					Utilities
 							.print(Utilities
 									.padString(playerController[board.boardArray[row][col]].getPlayer().getToken(), " ",
-											String.valueOf(columns).length() + 1 - String.valueOf(
+											String.valueOf(board.width()).length() + 1 - String.valueOf(
 													playerController[board.boardArray[row][col]].getPlayer().getToken())
 													.length()));
 				}
@@ -122,7 +125,7 @@ public class BoardController {
 	// Takes a player ID and column to log.
 	public int tryMove(Player player, int col) {
 		// If the column isn't valid, return -2
-		if (col < 0 || col >= columns) {
+		if (col < 0 || col >= board.width()) {
 			return -2;
 		}
 
@@ -141,12 +144,12 @@ public class BoardController {
 		makeMove(player, move);
 
 		// If we've gotten this far, let's perform our state check and return
-		return checkForWinOrDraw();
+		return checkForWinOrDraw(player, move);
 	}
 
 	// Gets the lowest open row for a given column
 	public int getLowestRow(int col) {
-		for (int row = (rows - 1); row >= 0; row--) {
+		for (int row = (board.height() - 1); row >= 0; row--) {
 			if (board.boardArray[row][col] == -1) {
 				return row;
 			}
@@ -163,23 +166,21 @@ public class BoardController {
 	}
 
 	// Checks for a win (player ID) or a draw (-1)
-	private int checkForWinOrDraw() {
+	private int checkForWinOrDraw(Player player, BoardSquare move) {
 		// Returns:
 		// 0 = Game continues
 		// 1 = Player 1 wins (checkForWin)
 		// 2 = Player 2 wins (checkForWin)
 		// -1 = Draw detected (checkForDraw)
 
-		// Check for a winner
-		int winner = BoardIterator.checkForWin(this);
-
 		// If we have a win, return the player number
-		if (winner != 0) {
-			return winner;
+		boolean isWin = BoardChecker.isWinningMove(this, move);
+		if (isWin) {
+			return (player.getIndex() + 1);
 		}
 
 		// Otherwise check for a draw
-		int draw = BoardIterator.checkForDraw(this);
+		int draw = BoardChecker.checkForDraw(this);
 
 		// Return an appropriate value
 		if (draw == 0) {

@@ -18,41 +18,27 @@ public class BoardSquare {
 		return row;
 	}
 
+	public String coordinates() {
+		return row + "," + col;
+	}
+
 	public void move(String direction) {
-		if (direction.equalsIgnoreCase("N")) {
-			row -= 1;
-		}
+		if (direction.length() == 1) {
+			if (direction.equals("N")) {
+				row -= 1;
+			} else if (direction.equals("E")) {
+				col += 1;
+			} else if (direction.equals("S")) {
+				row += 1;
+			} else if (direction.equals("W")) {
+				col -= 1;
+			}
+		} else {
+			char[] dir = direction.toCharArray();
 
-		if (direction.equalsIgnoreCase("E")) {
-			col += 1;
-		}
-
-		if (direction.equalsIgnoreCase("S")) {
-			row += 1;
-		}
-
-		if (direction.equalsIgnoreCase("W")) {
-			col -= 1;
-		}
-
-		if (direction.equalsIgnoreCase("NE")) {
-			move("N");
-			move("E");
-		}
-
-		if (direction.equalsIgnoreCase("SE")) {
-			move("S");
-			move("E");
-		}
-
-		if (direction.equalsIgnoreCase("SW")) {
-			move("S");
-			move("W");
-		}
-
-		if (direction.equalsIgnoreCase("NW")) {
-			move("N");
-			move("W");
+			for (int i = 0; i < dir.length; i++) {
+				move(String.valueOf(dir[i]));
+			}
 		}
 	}
 }
