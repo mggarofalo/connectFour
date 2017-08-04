@@ -12,57 +12,31 @@ public class GameController {
 
 	public void play() {
 		do {
+			int moveResponse;
+
 			if (game.getCurrentPlayer().isHuman()) {
-				handleHumanMove();
+				moveResponse = handleHumanMove();
 			} else {
-				handleAIMove();
+				moveResponse = handleAIMove();
 			}
+
+			// Check gameOver status
+			game.gameOver = handleSuccessfulMove(moveResponse);
 		} while (!game.gameOver);
 	}
 
-	private void handleHumanMove() {
-		// Initialize the response variable
-		int tryMoveResponse;
+	private int handleHumanMove() {
+		// Print any AI moves since the last human move
+		printAIMoves();
 
-		// If the last move was not played by a human player, display a message to this
-		// user detailing all AI moves since the last human player move
-		ArrayList<BoardMove> movesByAI = game.boardController.readLog().getLastAIMoves();
-		if (movesByAI.size() > 0) {
-			// Print a spacer
-			Utilities.println();
+		// Print prompt and new board
+		printNewBoardAndPrompt();
 
-			// Print the moves
-			for (int i = 0; i < movesByAI.size(); i++) {
-				Utilities.println(movesByAI.get(i).getPlayer().getName() + " played at "
-						+ movesByAI.get(i).getBoardSquare().coordinatesReadable() + ".");
-			}
-
-			// Print a spacer
-			Utilities.println();
-		}
-
-		// Set up the prompt so that we can measure it for the spacer
-		prompt = "Your turn, " + game.getCurrentPlayerName() + " (" + game.getCurrentPlayerToken()
-				+ "). Pick a column (1-" + game.boardController.width() + "): ";
-
-		// Print the space and new board
-		printSpacer(prompt, "-");
-		game.boardController.printBoard(game.playerController);
-
-		// Print the prompt
-		Utilities.print(prompt);
-
-		// Get the input and try to move
-		tryMoveResponse = handleTryMoveErrors(getInputAndTryToMove());
-
-		// Handle successful move
-		game.gameOver = handleSuccessfulMove(tryMoveResponse);
+		// Get the input, forcing a successful move, and make the move
+		return forceSuccessfulMove(getInputAndTryToMove());
 	}
 
-	private void handleAIMove() {
-		// Initialize the response variable
-		int tryMoveResponse;
-
+	private int handleAIMove() {
 		BoardSquare move = new BoardSquare(0, 0);
 		// Check the board for threats (open 2 or closed 3 where four are possible). If
 		// multiple are found, pick a random one and play on it to block.
@@ -86,10 +60,40 @@ public class GameController {
 
 		// Check the board for line extensions
 
-		// Try the move
-		tryMoveResponse = handleTryMoveErrors(game.boardController.tryMove(game.getCurrentPlayer(), move.col()));
+		// Make the move
+		return forceSuccessfulMove(tryToMove(move.col()));
+	}
 
-		game.gameOver = handleSuccessfulMove(tryMoveResponse);
+	private void printAIMoves() {
+		// If the last move was not played by a human player, display a message to this
+		// user detailing all AI moves since the last human player move
+		ArrayList<BoardMove> movesByAI = game.boardController.readLog().getLastAIMoves();
+		if (movesByAI.size() > 0) {
+			// Print a spacer
+			Utilities.println();
+
+			// Print the moves
+			for (int i = 0; i < movesByAI.size(); i++) {
+				Utilities.println(movesByAI.get(i).getPlayer().getName() + " played at "
+						+ movesByAI.get(i).getBoardSquare().coordinatesReadable() + ".");
+			}
+
+			// Print a spacer
+			Utilities.println();
+		}
+	}
+
+	private void printNewBoardAndPrompt() {
+		// Set up the prompt so that we can measure it for the spacer
+		prompt = "Your turn, " + game.getCurrentPlayerName() + " (" + game.getCurrentPlayerToken()
+				+ "). Pick a column (1-" + game.boardController.width() + "): ";
+
+		// Print the space and new board
+		printSpacer(prompt, "-");
+		game.boardController.printBoard(game.playerController);
+
+		// Print the prompt
+		Utilities.print(prompt);
 	}
 
 	private void printSpacer(String s, String c) {
@@ -101,17 +105,15 @@ public class GameController {
 
 	private int getInputAndTryToMove() {
 		int selectedColumn = Utilities.makeUserInputAPositiveNumber() - 1;
-		return game.boardController.tryMove(game.getCurrentPlayer(), selectedColumn);
+		return tryToMove(selectedColumn);
 	}
 
-	private int handleTryMoveErrors(int tryMoveResponse) {
-		while (isInvalidMove(tryMoveResponse)) {
-			if (tryMoveResponse == -2) {
-				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
-			} else if (tryMoveResponse == -3) {
-				Utilities.print("Sorry, but that column is full. Try again: ");
-			}
+	private int tryToMove(int col) {
+		return game.boardController.tryMove(game.getCurrentPlayer(), col);
+	}
 
+	private int forceSuccessfulMove(int tryMoveResponse) {
+		while (isInvalidMove(tryMoveResponse)) {
 			tryMoveResponse = getInputAndTryToMove();
 		}
 

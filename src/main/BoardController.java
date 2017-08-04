@@ -102,6 +102,7 @@ public class BoardController {
 				throw new IllegalArgumentException(
 						"An AI player just tried to move in column " + col + ", which is not valid.");
 			} else {
+				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
 				return -2;
 			}
 		}
@@ -115,6 +116,7 @@ public class BoardController {
 				throw new IllegalArgumentException(
 						"An AI player just tried to move in column " + col + ", which is full.");
 			} else {
+				Utilities.print("Sorry, but that column is full. Try again: ");
 				return -3;
 			}
 		}
