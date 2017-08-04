@@ -1,6 +1,7 @@
 package main;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Utilities {
@@ -38,6 +39,17 @@ public class Utilities {
 	// case-sensitive)
 	public static boolean stringExistsInStringArray(String[] values, String toFind) {
 		return stringExistsInStringArray(values, toFind, true);
+	}
+
+	// Checks to see whether a given string exists in a given ArrayList<String>
+	public static boolean stringExistsInStringArrayList(ArrayList<String> values, String toFind) {
+		String[] valuesString = new String[values.size()];
+
+		for (int i = 0; i < values.size(); i++) {
+			valuesString[i] = values.get(i);
+		}
+
+		return stringExistsInStringArray(valuesString, toFind, true);
 	}
 
 	// Checks to see whether a given string exists in a given array (case-sensitive

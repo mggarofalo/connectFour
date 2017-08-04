@@ -18,16 +18,16 @@ public class Game {
 		return rand.intValue();
 	}
 
-	public Player getCurrentPlayer() {
-		return playerController[turn].getPlayer();
+	public PlayerController getCurrentPlayerController() {
+		return playerController[turn];
 	}
 
 	public String getCurrentPlayerName() {
-		return playerController[turn].getPlayer().getName();
+		return playerController[turn].getName();
 	}
 
 	public String getCurrentPlayerToken() {
-		return playerController[turn].getPlayer().getToken();
+		return playerController[turn].getToken();
 	}
 
 }

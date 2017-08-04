@@ -14,7 +14,7 @@ public class GameController {
 		do {
 			int moveResponse;
 
-			if (game.getCurrentPlayer().isHuman()) {
+			if (game.getCurrentPlayerController().isHuman()) {
 				moveResponse = handleHumanMove();
 			} else {
 				moveResponse = handleAIMove();
@@ -37,8 +37,11 @@ public class GameController {
 	}
 
 	private int handleAIMove() {
+		// We'll need to know the win length here because the strategy depends on n-1
+		// and n-2
+
 		BoardSquare move = new BoardSquare(0, 0);
-		// Check the board for threats (open 2 or closed 3 where four are possible). If
+		// Check the board for threats (open or closed 3 where four are possible). If
 		// multiple are found, pick a random one and play on it to block.
 		// continue;
 
@@ -56,12 +59,13 @@ public class GameController {
 		// continue;
 
 		// Check the board for threats (open 2 or closed 3)
-		BoardSquare[] threat = BoardChecker.checkForThreats(game.boardController, move);
+		// BoardSquare[] threat = BoardChecker.checkForThreats(game.boardController,
+		// move);
 
 		// Check the board for line extensions
 
 		// Make the move
-		return forceSuccessfulMove(tryToMove(move.col()));
+		return tryToMove(move.col());
 	}
 
 	private void printAIMoves() {
@@ -74,7 +78,7 @@ public class GameController {
 
 			// Print the moves
 			for (int i = 0; i < movesByAI.size(); i++) {
-				Utilities.println(movesByAI.get(i).getPlayer().getName() + " played at "
+				Utilities.println(movesByAI.get(i).getPlayer().name + " played at "
 						+ movesByAI.get(i).getBoardSquare().coordinatesReadable() + ".");
 			}
 
@@ -109,7 +113,7 @@ public class GameController {
 	}
 
 	private int tryToMove(int col) {
-		return game.boardController.tryMove(game.getCurrentPlayer(), col);
+		return game.boardController.tryMove(game.getCurrentPlayerController(), col);
 	}
 
 	private int forceSuccessfulMove(int tryMoveResponse) {

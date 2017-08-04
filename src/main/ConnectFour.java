@@ -5,6 +5,9 @@ import java.util.Random;
 
 public class ConnectFour {
 
+	// Note: A maximum of 62 AI players are permitted because I don't want to go
+	// through token-getting outside of [A-Za-z0-9]
+
 	static int columns = 7; // Default value
 	static int rows = 6; // Default value
 	static int winLength = 4; // Default value

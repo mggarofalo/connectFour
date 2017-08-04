@@ -16,8 +16,8 @@ public class BoardMoveLog {
 	private ArrayList<BoardMove> moves = new ArrayList<BoardMove>();
 
 	// Takes a player and BoardSquare and adds them to the ArrayList.
-	public void addMove(Player player, BoardSquare move) {
-		moves.add(new BoardMove(new Date(), player, move));
+	public void addMove(PlayerController playerController, BoardSquare move) {
+		moves.add(new BoardMove(new Date(), playerController.getPlayer(), move));
 	}
 
 	// Gets an ArrayList of all the moves
@@ -37,7 +37,7 @@ public class BoardMoveLog {
 
 	// Gets an ArrayList of all the AI moves after the last human move
 	public ArrayList<BoardMove> getLastAIMoves() {
-		if (moves.size() == 0 || getLastMove().getPlayer().isHuman()) {
+		if (moves.size() == 0 || getLastMove().getPlayer().isHuman) {
 			// Return an empty ArrayList
 			return new ArrayList<BoardMove>();
 		} else {
@@ -45,7 +45,7 @@ public class BoardMoveLog {
 
 			// Get the index of the first AI move after the last human move
 			for (int i = (moves.size() - 1); i >= 0; i--) {
-				if (moves.get(i).getPlayer().isHuman()) {
+				if (moves.get(i).getPlayer().isHuman) {
 					// Add all the subsequent moves to the ArrayList
 					for (int j = (i + 1); i < moves.size(); i++) {
 						movesByAI.add(moves.get(j));

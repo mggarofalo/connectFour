@@ -50,6 +50,86 @@ public class BoardController {
 		return log;
 	}
 
+	// Takes a player ID and column to log.
+	public int tryMove(PlayerController playerController, int col) {
+		// If the column isn't valid, throw an AI exception or return -2
+		if (col < 0 || col >= board.width()) {
+			if (!playerController.isHuman()) {
+				throw new IllegalArgumentException(
+						"An AI player just tried to move in column " + col + ", which is not valid.");
+			} else {
+				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
+				return -2;
+			}
+		}
+
+		// Get the lowest row now so we only have to get it once per move attempt
+		int lowestRow = getLowestRow(col);
+
+		// If the column is full, throw an AI exception or return -3
+		if (lowestRow == -1) {
+			if (!playerController.isHuman()) {
+				throw new IllegalArgumentException(
+						"An AI player just tried to move in column " + col + ", which is full.");
+			} else {
+				Utilities.print("Sorry, but that column is full. Try again: ");
+				return -3;
+			}
+		}
+
+		// First, convert the column to a move.
+		BoardSquare move = new BoardSquare(lowestRow, col);
+
+		// Then call the logMove overload
+		makeMove(playerController, move);
+
+		// If we've gotten this far, let's perform our state check and return
+		return checkForWinOrDraw(playerController, move);
+	}
+
+	// Gets the lowest open row for a given column
+	public int getLowestRow(int col) {
+		for (int row = (board.height() - 1); row >= 0; row--) {
+			if (board.boardArray[row][col] == -1) {
+				return row;
+			}
+		}
+
+		// If the column is full, return -1
+		return -1;
+	}
+
+	// Takes a player ID and move to log and add to the board
+	public void makeMove(PlayerController playerController, BoardSquare move) {
+		log.addMove(playerController, move);
+		board.boardArray[move.row()][move.col()] = playerController.getIndex();
+	}
+
+	// Checks for a win (player ID) or a draw (-1)
+	private int checkForWinOrDraw(PlayerController playerController, BoardSquare move) {
+		// Returns:
+		// 0 = Game continues
+		// 1 = Player 1 wins (checkForWin)
+		// 2 = Player 2 wins (checkForWin)
+		// -1 = Draw detected (checkForDraw)
+
+		// If we have a win, return the player number
+		boolean isWin = BoardChecker.isWinningMove(this, move);
+		if (isWin) {
+			return (playerController.getIndex() + 1);
+		}
+
+		// Otherwise check for a draw
+		int draw = BoardChecker.checkForDraw(this);
+
+		// Return an appropriate value
+		if (draw == 0) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+
 	// Print the board to the console
 	public void printBoard(PlayerController[] playerController) {
 		// Print leading line
@@ -77,12 +157,9 @@ public class BoardController {
 				if (board.boardArray[row][col] == -1) {
 					Utilities.print(Utilities.padString(" ", null, String.valueOf(board.width()).length()));
 				} else {
-					Utilities
-							.print(Utilities
-									.padString(playerController[board.boardArray[row][col]].getPlayer().getToken(), " ",
-											String.valueOf(board.width()).length() + 1 - String.valueOf(
-													playerController[board.boardArray[row][col]].getPlayer().getToken())
-													.length()));
+					Utilities.print(Utilities.padString(playerController[board.boardArray[row][col]].getToken(), " ",
+							String.valueOf(board.width()).length() + 1 - String
+									.valueOf(playerController[board.boardArray[row][col]].getToken()).length()));
 				}
 
 				// Dividing border
@@ -91,86 +168,6 @@ public class BoardController {
 
 			// End the row and loop again
 			Utilities.println();
-		}
-	}
-
-	// Takes a player ID and column to log.
-	public int tryMove(Player player, int col) {
-		// If the column isn't valid, throw an AI exception or return -2
-		if (col < 0 || col >= board.width()) {
-			if (!player.isHuman()) {
-				throw new IllegalArgumentException(
-						"An AI player just tried to move in column " + col + ", which is not valid.");
-			} else {
-				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
-				return -2;
-			}
-		}
-
-		// Get the lowest row now so we only have to get it once per move attempt
-		int lowestRow = getLowestRow(col);
-
-		// If the column is full, throw an AI exception or return -3
-		if (lowestRow == -1) {
-			if (!player.isHuman()) {
-				throw new IllegalArgumentException(
-						"An AI player just tried to move in column " + col + ", which is full.");
-			} else {
-				Utilities.print("Sorry, but that column is full. Try again: ");
-				return -3;
-			}
-		}
-
-		// First, convert the column to a move.
-		BoardSquare move = new BoardSquare(lowestRow, col);
-
-		// Then call the logMove overload
-		makeMove(player, move);
-
-		// If we've gotten this far, let's perform our state check and return
-		return checkForWinOrDraw(player, move);
-	}
-
-	// Gets the lowest open row for a given column
-	public int getLowestRow(int col) {
-		for (int row = (board.height() - 1); row >= 0; row--) {
-			if (board.boardArray[row][col] == -1) {
-				return row;
-			}
-		}
-
-		// If the column is full, return -1
-		return -1;
-	}
-
-	// Takes a player ID and move to log and add to the board
-	public void makeMove(Player player, BoardSquare move) {
-		log.addMove(player, move);
-		board.boardArray[move.row()][move.col()] = player.getIndex();
-	}
-
-	// Checks for a win (player ID) or a draw (-1)
-	private int checkForWinOrDraw(Player player, BoardSquare move) {
-		// Returns:
-		// 0 = Game continues
-		// 1 = Player 1 wins (checkForWin)
-		// 2 = Player 2 wins (checkForWin)
-		// -1 = Draw detected (checkForDraw)
-
-		// If we have a win, return the player number
-		boolean isWin = BoardChecker.isWinningMove(this, move);
-		if (isWin) {
-			return (player.getIndex() + 1);
-		}
-
-		// Otherwise check for a draw
-		int draw = BoardChecker.checkForDraw(this);
-
-		// Return an appropriate value
-		if (draw == 0) {
-			return -1;
-		} else {
-			return 0;
 		}
 	}
 }
