@@ -5,21 +5,82 @@ import java.util.ArrayList;
 
 public class BoardChecker {
 
-	private static List<String> dir;
-	private static BoardController boardController;
-	private static int[] winner = new int[4];
+	private static List<String> directions;
+	private static GameController gc = ConnectFour.gameController;
+	private static BoardController bc = ConnectFour.gameController.game.boardController;
 
-	public static BoardSquare[] checkForThreats(BoardController bc, BoardSquare square) {
-		return new BoardSquare[] { new BoardSquare(0, 0), new BoardSquare(0, 0) };
+	public static Object[][] findMoveThatExtendsRun(int length) {
+		directions = setUpDirectionArray(true);
+
+		// This object has three sets: BoardSquare (0), direction (1), and run owner (2)
+		Object[][] extendingMoves = new Object[3][];
+		int i = 0; // Object index
+
+		// Check each possible move to see if it could block a winning run
+		for (BoardSquare move : bc.getPossibleMoves()) {
+			// Check each direction
+			for (String d : directions) {
+
+				// Skip if we can't move as far as we need to
+				if (!enoughSpaceInDirection(move, d, length + 1)) {
+					continue;
+				}
+
+				// Reinitialize so that we don't lose the possible move we're checking
+				BoardSquare threatCheckStart = move;
+
+				// Move in a direction
+				threatCheckStart.move(d);
+
+				// Read (winLength - 1) squares in a direction
+				ArrayList<BoardSquare> squares = iterateAndRead(threatCheckStart, d, length);
+
+				// Find out if this is a run and, if so, whose run it is
+				int runOwner = checkEquality(squares);
+
+				// If this is a threat, add the move to the list
+				if (runOwner != -1 && runOwner != 0) {
+					extendingMoves[0][i] = move;
+					extendingMoves[1][i] = d;
+					extendingMoves[2][i] = runOwner;
+					i += 1;
+					break;
+				}
+			}
+		}
+
+		return extendingMoves;
 	}
 
-	public static boolean isWinningMove(BoardController bc, BoardSquare square) {
-		dir = setUpDirectionArray(true);
-		boardController = bc;
+	public static boolean isValidColumn(int col) {
+		if (col < 0 || col >= gc.game.boardController.width()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-		for (int i = 0; i < dir.size(); i++) {
-			if (enoughSpaceInDirection(square.row(), square.col(), dir.get(i))) {
-				boolean isWinner = isWinner(square.row(), square.col(), dir.get(i));
+	public static int isLegalMove(BoardSquare square) {
+		if (square.row() < 0 || square.row() >= gc.game.boardController.height()) {
+			// Somehow the row selection isn't valid...
+			throw new IllegalArgumentException(
+					"Somehow the row isn't valid for " + gc.game.getCurrentPlayerName() + ". Weird.");
+		} else if (bc.readBoardSquare(square) != -1) {
+			// The square isn't empty
+			return 1;
+		} else {
+			// The square is playable
+			return 0;
+		}
+	}
+
+	public static boolean isWinningMove(BoardMove move) {
+		directions = setUpDirectionArray(true);
+
+		for (int i = 0; i < directions.size(); i++) {
+			if (enoughSpaceInDirection(new BoardSquare(move.getBoardSquare()), directions.get(i),
+					gc.game.getWinLength())) {
+				boolean isWinner = isWinner(new BoardSquare(move.getBoardSquare()), directions.get(i));
 
 				if (isWinner) {
 					return isWinner;
@@ -30,40 +91,40 @@ public class BoardChecker {
 		return false;
 	}
 
-	public static int checkForWin(BoardController bc) {
-		// Returns: 0 = No win detected, 1 = Player 1 won, 2 = Player 2 won
-		dir = setUpDirectionArray(false);
-		boardController = bc;
+	// Checks for a win (player ID) or a draw (-1)
+	public static int checkForWin(BoardMove move) {
+		// Returns:
+		// 0 = Game continues
+		// 1 = Player 1 wins (checkForWin)
+		// 2 = Player 2 wins (checkForWin)
 
-		for (int row = 0; row < boardController.height(); row++) {
-			for (int col = 0; col < boardController.width(); col++) {
-				for (int i = 0; i < dir.size(); i++) {
-					if (enoughSpaceInDirection(row, col, dir.get(i))) {
-						winner[i] = checkForWinner(row, col, dir.get(i));
-					}
-				}
-			}
+		// If we have a win, return the player number
+		if (BoardChecker.isWinningMove(move)) {
+			return (move.getPlayer().index + 1);
+		} else {
+			return 0;
 		}
-
-		// If we found a winner anywhere, let's return the ID
-		for (int i = 0; i < winner.length; i++) {
-			if (winner[i] == 0) {
-			} else {
-				return winner[i];
-			}
-		}
-
-		// If we didn't find a winner, let's return 0
-		return 0;
 	}
 
-	public static int checkForDraw(BoardController bc) {
-		if (bc.readLog().getMoves().size() == (bc.width() * bc.height())) {
-			return 0;
+	public static boolean isDraw() {
+		if (bc.getLog().getMoves().size() == (bc.width() * bc.height())) {
+			return true;
 		} else {
 			// Iterate through the board to see if there are possible wins. If so, return 0.
 		}
 
+		return false;
+	}
+
+	// Gets the lowest open row for a given column
+	public static int getLowestRow(int col) {
+		for (int row = (bc.height() - 1); row >= 0; row--) {
+			if (bc.readBoardSquare(new BoardSquare(row, col)) == -1) {
+				return row;
+			}
+		}
+
+		// If the column is full, return -1
 		return -1;
 	}
 
@@ -85,25 +146,25 @@ public class BoardChecker {
 		return dir;
 	}
 
-	private static boolean enoughSpaceInDirection(int row, int col, String dir) {
-		if (dir.length() == 1) {
-			if (dir.equals("N")) {
-				return (row >= (boardController.winLength() - 1));
-			} else if (dir.equals("S")) {
-				return (row <= (boardController.height() - boardController.winLength()));
-			} else if (dir.equals("E")) {
-				return (col <= (boardController.width() - boardController.winLength()));
-			} else if (dir.equals("W")) {
-				return (col >= (boardController.winLength() - 1));
+	private static boolean enoughSpaceInDirection(BoardSquare checkSquare, String direction, int length) {
+		if (direction.length() == 1) {
+			if (direction.equals("N")) {
+				return (checkSquare.row() >= (length - 1));
+			} else if (direction.equals("S")) {
+				return (checkSquare.row() <= (bc.height() - length));
+			} else if (direction.equals("E")) {
+				return (checkSquare.col() <= (bc.width() - length));
+			} else if (direction.equals("W")) {
+				return (checkSquare.col() >= (length - 1));
 			} else {
 				return false;
 			}
 		} else {
 			boolean ret = true;
-			char[] d = dir.toCharArray();
+			char[] d = direction.toCharArray();
 
 			for (int i = 0; i < d.length; i++) {
-				if (!enoughSpaceInDirection(row, col, String.valueOf(d[i]))) {
+				if (!enoughSpaceInDirection(checkSquare, String.valueOf(d[i]), length)) {
 					ret = false;
 				}
 			}
@@ -112,8 +173,9 @@ public class BoardChecker {
 		}
 	}
 
-	private static boolean isWinner(int row, int col, String direction) {
-		Object[] squares = iterateAndRead(row, col, direction);
+	private static boolean isWinner(BoardSquare checkSquare, String direction) {
+		ArrayList<BoardSquare> squares = iterateAndRead(checkSquare, direction, gc.game.getWinLength());
+
 		int equality = checkEquality(squares);
 		if (equality == -1 || equality == 0) {
 			return false;
@@ -122,25 +184,21 @@ public class BoardChecker {
 		}
 	}
 
-	private static int checkForWinner(int row, int col, String direction) {
-		return checkEquality(iterateAndRead(row, col, direction));
-	}
+	private static ArrayList<BoardSquare> iterateAndRead(BoardSquare startingSquare, String direction, int length) {
+		ArrayList<BoardSquare> squares = new ArrayList<BoardSquare>(length);
+		BoardSquare checkSquare = new BoardSquare(startingSquare);
 
-	private static Object[] iterateAndRead(int row, int col, String direction) {
-		BoardSquare checkSquare = new BoardSquare(row, col);
-		Object[] squares = new Object[boardController.winLength()];
-
-		for (int i = 0; i < boardController.winLength(); i++) {
-			squares[i] = boardController.readBoardSquare(checkSquare);
+		for (int i = 0; i < length; i++) {
+			squares.add(new BoardSquare(checkSquare));
 			checkSquare.move(direction);
 		}
 
 		return squares;
 	}
 
-	private static int checkEquality(Object[] squares) {
-		if (Utilities.allAreEqual(squares) && (int) squares[0] != -1) {
-			return (int) squares[0] + 1;
+	private static int checkEquality(ArrayList<BoardSquare> squares) {
+		if (Utilities.allAreEqual(bc, squares) && bc.readBoardSquare(squares.get(0)) != -1) {
+			return bc.readBoardSquare((BoardSquare) squares.get(0)) + 1;
 		} else {
 			return 0;
 		}

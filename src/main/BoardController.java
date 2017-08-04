@@ -1,15 +1,14 @@
 package main;
 
+import java.util.ArrayList;
+
 public class BoardController {
 
-	private final int winLength;
 	private Board board;
 	private BoardMoveLog log;
 
 	// Initializes a game with dimensions
 	public BoardController(int rows, int columns, int winLength) {
-		this.winLength = winLength;
-
 		// Convert row/column counts to an in[][]
 		int[][] boardArray = new int[rows][columns];
 
@@ -34,11 +33,6 @@ public class BoardController {
 		return board.width();
 	}
 
-	// Returns the number of tokens needed in a row to win
-	public int winLength() {
-		return winLength;
-	}
-
 	// Returns the contents of a given BoardSquare
 	public int readBoardSquare(BoardSquare square) {
 		return board.boardArray[square.row()][square.col()];
@@ -46,88 +40,39 @@ public class BoardController {
 
 	// Same as above with the log. This will be necessary when implementing AI
 	// strategy, since it will be necessary to see the opponent's previous play.
-	public BoardMoveLog readLog() {
+	public BoardMoveLog getLog() {
 		return log;
 	}
 
-	// Takes a player ID and column to log.
-	public int tryMove(PlayerController playerController, int col) {
-		// If the column isn't valid, throw an AI exception or return -2
-		if (col < 0 || col >= board.width()) {
-			if (!playerController.isHuman()) {
-				throw new IllegalArgumentException(
-						"An AI player just tried to move in column " + col + ", which is not valid.");
-			} else {
-				Utilities.print("Sorry, but that isn't a valid column selection. Try again: ");
-				return -2;
-			}
+	// Gets all possible moves on the board
+	public ArrayList<BoardSquare> getPossibleMoves() {
+		ArrayList<BoardSquare> possibleMoves = new ArrayList<BoardSquare>(width());
+
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			possibleMoves.add(new BoardSquare(BoardChecker.getLowestRow(i), i));
 		}
 
-		// Get the lowest row now so we only have to get it once per move attempt
-		int lowestRow = getLowestRow(col);
-
-		// If the column is full, throw an AI exception or return -3
-		if (lowestRow == -1) {
-			if (!playerController.isHuman()) {
-				throw new IllegalArgumentException(
-						"An AI player just tried to move in column " + col + ", which is full.");
-			} else {
-				Utilities.print("Sorry, but that column is full. Try again: ");
-				return -3;
-			}
-		}
-
-		// First, convert the column to a move.
-		BoardSquare move = new BoardSquare(lowestRow, col);
-
-		// Then call the logMove overload
-		makeMove(playerController, move);
-
-		// If we've gotten this far, let's perform our state check and return
-		return checkForWinOrDraw(playerController, move);
+		return possibleMoves;
 	}
 
-	// Gets the lowest open row for a given column
-	public int getLowestRow(int col) {
-		for (int row = (board.height() - 1); row >= 0; row--) {
-			if (board.boardArray[row][col] == -1) {
-				return row;
-			}
+	// Takes a column and returns the BoardSquare in that column that constitutes a
+	// valid move (or null if the column is full)
+	public BoardSquare getMoveForColumn(int col) {
+		BoardSquare move = null;
+
+		int lowestRow = BoardChecker.getLowestRow(col);
+
+		if (lowestRow != -1) {
+			move = new BoardSquare(lowestRow, col);
 		}
 
-		// If the column is full, return -1
-		return -1;
+		return move;
 	}
 
 	// Takes a player ID and move to log and add to the board
-	public void makeMove(PlayerController playerController, BoardSquare move) {
-		log.addMove(playerController, move);
-		board.boardArray[move.row()][move.col()] = playerController.getIndex();
-	}
-
-	// Checks for a win (player ID) or a draw (-1)
-	private int checkForWinOrDraw(PlayerController playerController, BoardSquare move) {
-		// Returns:
-		// 0 = Game continues
-		// 1 = Player 1 wins (checkForWin)
-		// 2 = Player 2 wins (checkForWin)
-		// -1 = Draw detected (checkForDraw)
-
-		// If we have a win, return the player number
-		boolean isWin = BoardChecker.isWinningMove(this, move);
-		if (isWin) {
-			return (playerController.getIndex() + 1);
-		}
-
-		// Otherwise check for a draw
-		int draw = BoardChecker.checkForDraw(this);
-
-		// Return an appropriate value
-		if (draw == 0) {
-			return -1;
-		} else {
-			return 0;
-		}
+	public void makeMove(BoardMove move) {
+		log.addMove(move);
+		board.boardArray[move.getBoardSquare().row()][move.getBoardSquare().col()] = move.getPlayer().index;
 	}
 
 	// Print the board to the console

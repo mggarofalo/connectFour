@@ -10,13 +10,37 @@ public class Utilities {
 
 	// Region "Evaluators"
 
-	// Checks to see whether all values in a given array are equal
-	public static boolean allAreEqual(Object[] o) {
-		Object val = o[0];
+	// Checks to see whether all values in a given String array are equal
+	public static boolean allAreEqual(String[] s) {
+		if (s.length > 1) {
+			for (int i = 1; i < s.length; i++) {
+				if (!s[i].equals(s[0])) {
+					return false;
+				}
+			}
+		}
 
-		if (o.length > 1) {
-			for (int i = 1; i < o.length; i++) {
-				if (!o[i].equals(val)) {
+		return true;
+	}
+
+	// Checks to see whether all values in a given int array are equal
+	public static boolean allAreEqual(int[] i) {
+		if (i.length > 1) {
+			for (int j = 1; j < i.length; j++) {
+				if (i[j] != i[0]) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	// Checks to see whether all values in a given ArrayList<BoardSquare> are equal
+	public static boolean allAreEqual(BoardController bc, ArrayList<BoardSquare> al) {
+		if (al.size() > 1) {
+			for (int i = 1; i < al.size(); i++) {
+				if (bc.readBoardSquare(al.get(i)) != (bc.readBoardSquare((al.get(0))))) {
 					return false;
 				}
 			}
@@ -193,6 +217,10 @@ public class Utilities {
 		print(s, false);
 	}
 
+	public static void print(int i) {
+		print(Integer.toString(i));
+	}
+
 	public static void print(boolean b) {
 		print((b ? "true" : "false"), false);
 	}
@@ -203,6 +231,10 @@ public class Utilities {
 
 	public static void println(String s) {
 		print(s, true);
+	}
+
+	public static void println(int i) {
+		print(Integer.toString(i), true);
 	}
 
 	public static void println(boolean b) {

@@ -1,9 +1,10 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class GameController {
-	private Game game;
+	public Game game;
 	private String prompt;
 
 	public GameController(PlayerController[] playerController, int rows, int columns, int winLength) {
@@ -12,16 +13,12 @@ public class GameController {
 
 	public void play() {
 		do {
-			int moveResponse;
-
+			// Process move for the current player
 			if (game.getCurrentPlayerController().isHuman()) {
-				moveResponse = handleHumanMove();
+				handleMoveResponse(handleHumanMove());
 			} else {
-				moveResponse = handleAIMove();
+				handleMoveResponse(handleAIMove());
 			}
-
-			// Check gameOver status
-			game.gameOver = handleSuccessfulMove(moveResponse);
 		} while (!game.gameOver);
 	}
 
@@ -32,22 +29,37 @@ public class GameController {
 		// Print prompt and new board
 		printNewBoardAndPrompt();
 
-		// Get the input, forcing a successful move, and make the move
+		// Get input and try to make the move, forcing success
 		return forceSuccessfulMove(getInputAndTryToMove());
 	}
 
 	private int handleAIMove() {
-		// We'll need to know the win length here because the strategy depends on n-1
-		// and n-2
+		// Check the board for runs of (winLength - 1) that could be extended or blocked
+		// with the next move.
+		Object[][] extendingMoves = BoardChecker.findMoveThatExtendsRun(game.getWinLength());
 
-		BoardSquare move = new BoardSquare(0, 0);
-		// Check the board for threats (open or closed 3 where four are possible). If
-		// multiple are found, pick a random one and play on it to block.
-		// continue;
+		// If there are any extending moves possible, let's handle one of those first
+		if (extendingMoves.length > 0) {
+			// If the current player has a run of 3, playing will win, so let's do that
+			for (int i = 0; i < extendingMoves[2].length; i++) {
+				if ((int) extendingMoves[2][i] == game.getCurrentPlayerController().getIndex()) {
+					BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(),
+							game.boardController.getMoveForColumn(((BoardSquare) extendingMoves[0][0]).col()));
+					game.boardController.makeMove(move);
+					return BoardChecker.checkForWin(move);
+				}
+			}
+
+			// If the current player doesn't have a winning move, play to block; if multiple
+			// are found, play on the first one
+			BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(),
+					game.boardController.getMoveForColumn(((BoardSquare) extendingMoves[0][0]).col()));
+			game.boardController.makeMove(move);
+			return BoardChecker.checkForWin(move);
+		}
 
 		// Find the move that will make the longest line where four are possible and
 		// play on it.
-		// continue;
 
 		// Try blocking a single opponent token where four are possible.
 		// continue;
@@ -65,13 +77,14 @@ public class GameController {
 		// Check the board for line extensions
 
 		// Make the move
-		return tryToMove(move.col());
+		// return tryToMove(move.col());
+		return 0;
 	}
 
 	private void printAIMoves() {
 		// If the last move was not played by a human player, display a message to this
 		// user detailing all AI moves since the last human player move
-		ArrayList<BoardMove> movesByAI = game.boardController.readLog().getLastAIMoves();
+		ArrayList<BoardMove> movesByAI = game.boardController.getLog().getLastAIMoves();
 		if (movesByAI.size() > 0) {
 			// Print a spacer
 			Utilities.println();
@@ -108,40 +121,65 @@ public class GameController {
 	}
 
 	private int getInputAndTryToMove() {
+		// Make the user put in a positive number
+		int selectedColumn = makeUserInputAValidColumn();
+
+		// Create the square reference (returns null if the column is full)
+		BoardSquare square = game.boardController.getMoveForColumn(selectedColumn);
+
+		// If the square isn't playable, start over
+		if (square == null || BoardChecker.isLegalMove(square) != 0) {
+			Utilities.print("That column isn't playable. Try again: ");
+			return getInputAndTryToMove();
+		} else {
+			// Make the move
+			BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(), square);
+			game.boardController.makeMove(move);
+			return BoardChecker.checkForWin(move);
+
+		}
+	}
+
+	private int makeUserInputAValidColumn() {
+		// Convert input to column index by subtracting 1
 		int selectedColumn = Utilities.makeUserInputAPositiveNumber() - 1;
-		return tryToMove(selectedColumn);
-	}
 
-	private int tryToMove(int col) {
-		return game.boardController.tryMove(game.getCurrentPlayerController(), col);
-	}
-
-	private int forceSuccessfulMove(int tryMoveResponse) {
-		while (isInvalidMove(tryMoveResponse)) {
-			tryMoveResponse = getInputAndTryToMove();
+		if (!BoardChecker.isValidColumn(selectedColumn)) {
+			Utilities.print("That column isn't valid for this board. Try again: ");
+			selectedColumn = makeUserInputAValidColumn();
 		}
 
-		return tryMoveResponse;
+		return selectedColumn;
 	}
 
-	private boolean isInvalidMove(int tryMoveResponse) {
-		return (tryMoveResponse == -2 || tryMoveResponse == -3);
+	private int forceSuccessfulMove(int moveResponse) {
+		while (isInvalidMove(moveResponse)) {
+			moveResponse = getInputAndTryToMove();
+		}
+
+		return moveResponse;
 	}
 
-	private boolean handleSuccessfulMove(int tryMoveResponse) {
-		if (tryMoveResponse == 0) {
-			// If the move was valid, swap turns
+	private boolean isInvalidMove(int moveResponse) {
+		return (moveResponse == -2 || moveResponse == -3);
+	}
+
+	private void handleMoveResponse(int moveResponse) {
+		if (moveResponse == 0) {
+			// Check for a draw
+			if (BoardChecker.isDraw()) {
+				Utilities.println();
+				Utilities.println("Looks like a draw to me. Game over, losers.");
+				game.gameOver = true;
+			}
+
+			// If the move was valid and there's no draw, swap turns
 			incrementOrResetTurn();
-		} else if (tryMoveResponse == -1) {
-			// If there's a draw, let the players know
-			Utilities.println("Looks like a draw to me. Game over, losers.");
 		} else {
 			// If the game is over, change the boolean so the program can exit
 			game.gameOver = true;
-			displayWinMessage(tryMoveResponse);
+			displayWinMessage(moveResponse);
 		}
-
-		return game.gameOver;
 	}
 
 	private void incrementOrResetTurn() {

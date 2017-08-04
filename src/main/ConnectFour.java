@@ -32,7 +32,7 @@ public class ConnectFour {
 	}
 
 	private static void setUpGame() {
-		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "N" }, "choice", false);
+		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "YES", "N", "NO" }, "choice", false);
 
 		if (choice.equalsIgnoreCase("N")) {
 			Utilities.print("How many players are there? ");

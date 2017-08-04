@@ -25,4 +25,13 @@ public class BoardMove {
 	public BoardSquare getBoardSquare() {
 		return this.move;
 	}
+
+	// Prints the details of the move
+	public void printMoveDetails() {
+		Utilities.println("Details for move:");
+		Utilities.println("Date: " + date);
+		Utilities.println("Player: " + player.name + "; Token: " + player.token + "; Index: " + player.index + "; "
+				+ (player.isHuman ? "Human" : "AI"));
+		Utilities.println("Move: " + move.coordinates() + " (" + move.coordinatesReadable() + ")");
+	}
 }

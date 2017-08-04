@@ -5,9 +5,14 @@ public class BoardSquare {
 	private int row;
 	private int col;
 
-	public BoardSquare(int aRow, int aColumn) {
-		row = aRow;
-		col = aColumn;
+	public BoardSquare(int row, int col) {
+		this.row = row;
+		this.col = col;
+	}
+
+	public BoardSquare(BoardSquare boardSquare) {
+		this.row = boardSquare.row;
+		this.col = boardSquare.col;
 	}
 
 	public int col() {
@@ -19,11 +24,11 @@ public class BoardSquare {
 	}
 
 	public String coordinates() {
-		return new String(row + "," + col);
+		return new String("index " + row + "," + col);
 	}
 
 	public String coordinatesReadable() {
-		return new String("row " + (row + 1) + ", column " + (col + 1));
+		return new String("display row " + (row + 1) + ", display column " + (col + 1));
 	}
 
 	public void move(String direction) {

@@ -1,7 +1,6 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 // DB integration notes
 
@@ -16,8 +15,8 @@ public class BoardMoveLog {
 	private ArrayList<BoardMove> moves = new ArrayList<BoardMove>();
 
 	// Takes a player and BoardSquare and adds them to the ArrayList.
-	public void addMove(PlayerController playerController, BoardSquare move) {
-		moves.add(new BoardMove(new Date(), playerController.getPlayer(), move));
+	public void addMove(BoardMove move) {
+		moves.add(move);
 	}
 
 	// Gets an ArrayList of all the moves
