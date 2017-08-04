@@ -95,7 +95,7 @@ public class PlayerGeneratorAI {
 
 	private static void setUpNameArrays() {
 		prefixes.add(new String[] { "Mr.", "Sir", "Lord", "Duke", "His Majesty the King" });
-		prefixes.add(new String[] { "Mrs.", "Ms.", "Lady", "Duchess", "Her Majesty the Queen" });
+		prefixes.add(new String[] { "Ms.", "Madam", "Lady", "Duchess", "Her Majesty the Queen" });
 
 		firstNames.add(new String[] { "Lothar", "Childebert", "Clovis", "Theuderic", "Childeric" });
 		firstNames.add(new String[] { "Basina", "Bilichildis", "Brunhild", "Clotild", "Theudechild" });
