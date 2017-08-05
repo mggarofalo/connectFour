@@ -105,6 +105,17 @@ public class Utilities {
 
 	// Region "Input Parsers"
 
+	// Makes the user type yes, no, y, or n, and returns an appropriate boolean
+	public static boolean userSaysYes() {
+		String choice = makeUserInputStringFromArray(new String[] { "YES", "Y", "NO", "N" }, "choice", false);
+
+		if (choice.equalsIgnoreCase("Y") || choice.equalsIgnoreCase("YES")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	// Sanitizes input to ensure that an integer is smaller than the largest of a
 	// set of ints
 	public static int makeUserInputAPositiveNumberSmallerThanArrayMax(int[] values) {
