@@ -9,15 +9,8 @@ public class BoardController {
 
 	// Initializes a game with dimensions
 	public BoardController(int rows, int columns, int winLength) {
-		// Convert row/column counts to an in[][]
-		int[][] boardArray = new int[rows][columns];
-
-		// Set initial values to empty (-1)
-		for (int row = 0; row < rows; row++) {
-			for (int col = 0; col < columns; col++) {
-				boardArray[row][col] = -1;
-			}
-		}
+		// Convert row/column counts to a Player[][]
+		Player[][] boardArray = new Player[rows][columns];
 
 		board = new Board(boardArray);
 		log = new BoardMoveLog();
@@ -34,7 +27,7 @@ public class BoardController {
 	}
 
 	// Returns the contents of a given BoardSquare
-	public int readBoardSquare(BoardSquare square) {
+	public Player readBoardSquare(BoardSquare square) {
 		return board.boardArray[square.row()][square.col()];
 	}
 
@@ -45,11 +38,14 @@ public class BoardController {
 	}
 
 	// Gets all possible moves on the board
-	public ArrayList<BoardSquare> getPossibleMoves() {
+	public ArrayList<BoardSquare> getPlayableSquares() {
 		ArrayList<BoardSquare> possibleMoves = new ArrayList<BoardSquare>(width());
 
-		for (int i = 0; i < possibleMoves.size(); i++) {
-			possibleMoves.add(new BoardSquare(BoardChecker.getLowestRow(i), i));
+		for (int i = 0; i < width(); i++) {
+			int lowestRow = BoardChecker.getLowestRow(i);
+			if (lowestRow != -1) {
+				possibleMoves.add(new BoardSquare(lowestRow, i));
+			}
 		}
 
 		return possibleMoves;
@@ -72,7 +68,7 @@ public class BoardController {
 	// Takes a player ID and move to log and add to the board
 	public void makeMove(BoardMove move) {
 		log.addMove(move);
-		board.boardArray[move.getBoardSquare().row()][move.getBoardSquare().col()] = move.getPlayer().index;
+		board.boardArray[move.getBoardSquare().row()][move.getBoardSquare().col()] = move.getPlayer();
 	}
 
 	// Print the board to the console
@@ -99,12 +95,12 @@ public class BoardController {
 			// Loop through columns in row
 			for (int col = 0; col < board.width(); col++) {
 				// Print blank space if the space is empty; otherwise print the player number.
-				if (board.boardArray[row][col] == -1) {
+				if (board.boardArray[row][col] == null) {
 					Utilities.print(Utilities.padString(" ", null, String.valueOf(board.width()).length()));
 				} else {
-					Utilities.print(Utilities.padString(playerController[board.boardArray[row][col]].getToken(), " ",
-							String.valueOf(board.width()).length() + 1 - String
-									.valueOf(playerController[board.boardArray[row][col]].getToken()).length()));
+					Utilities.print(Utilities.padString(board.boardArray[row][col].token, " ",
+							String.valueOf(board.width()).length() + 1
+									- String.valueOf(board.boardArray[row][col].token).length()));
 				}
 
 				// Dividing border

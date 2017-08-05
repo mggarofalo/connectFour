@@ -1,55 +1,157 @@
 package main;
 
-import java.util.List;
 import java.util.ArrayList;
 
 public class BoardChecker {
 
-	private static List<String> directions;
 	private static GameController gc = ConnectFour.gameController;
 	private static BoardController bc = ConnectFour.gameController.game.boardController;
 
-	public static Object[][] findMoveThatExtendsRun(int length) {
-		directions = setUpDirectionArray(true);
+	public static boolean isDraw() {
+		if (bc.getLog().getMoves().size() == (bc.width() * bc.height())) {
+			return true;
+		} else {
+			// Iterate through the board to see if there are possible wins. If so, return 0.
+		}
 
-		// This object has three sets: BoardSquare (0), direction (1), and run owner (2)
-		Object[][] extendingMoves = new Object[3][];
-		int i = 0; // Object index
+		return false;
+	}
 
-		// Check each possible move to see if it could block a winning run
-		for (BoardSquare move : bc.getPossibleMoves()) {
-			// Check each direction
-			for (String d : directions) {
-
-				// Skip if we can't move as far as we need to
-				if (!enoughSpaceInDirection(move, d, length + 1)) {
-					continue;
-				}
-
-				// Reinitialize so that we don't lose the possible move we're checking
-				BoardSquare threatCheckStart = move;
-
-				// Move in a direction
-				threatCheckStart.move(d);
-
-				// Read (winLength - 1) squares in a direction
-				ArrayList<BoardSquare> squares = iterateAndRead(threatCheckStart, d, length);
-
-				// Find out if this is a run and, if so, whose run it is
-				int runOwner = checkEquality(squares);
-
-				// If this is a threat, add the move to the list
-				if (runOwner != -1 && runOwner != 0) {
-					extendingMoves[0][i] = move;
-					extendingMoves[1][i] = d;
-					extendingMoves[2][i] = runOwner;
-					i += 1;
-					break;
+	// Checks for a win (player ID)
+	public static int checkForWin(BoardMove move) {
+		if (BoardChecker.isWinningMove(move)) {
+			// If we have a win, return the player number
+			return (move.getPlayer().index + 1);
+		} else {
+			// We have to check the whole board for a win, since wins can come by connecting
+			// two runs
+			for (int row = (bc.height() - 1); row >= 0; row--) {
+				for (int col = 0; col < bc.width(); col++) {
+					// Create a new BoardMove at the bottom left, iterating right and up
+					BoardMove moveToCheckForWin = new BoardMove(move.getDate(),
+							bc.readBoardSquare(new BoardSquare(row, col)), new BoardSquare(row, col));
+					if (isWinningMove(moveToCheckForWin)) {
+						return (move.getPlayer().index + 1);
+					}
 				}
 			}
 		}
 
-		return extendingMoves;
+		// The game continues
+		return 0;
+	}
+
+	public static boolean isWinningMove(BoardMove move) {
+		ArrayList<Direction> direction = Direction.setUpDirectionArray(true);
+
+		for (Direction dir : direction) {
+
+			if (enoughSpaceInDirection(new BoardSquare(move.getBoardSquare()), dir.direction, gc.game.getWinLength())) {
+				boolean isWinner = isWinner(move, dir.direction);
+
+				if (isWinner) {
+					return isWinner;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public static ArrayList<ThreatMove> findMovesThatExtendRun() {
+		gc.game.boardController.printBoard(gc.game.playerController);
+
+		ArrayList<Direction> direction = Direction.setUpDirectionArray(true);
+		ArrayList<BoardSquare> playableSquares = bc.getPlayableSquares();
+
+		// This object has four sets: BoardSquare (0), direction (1), run length (2),
+		// and run owner (3)
+		ArrayList<ThreatMove> threatMoves = new ArrayList<ThreatMove>();
+
+		for (BoardSquare playableSquare : playableSquares) {
+			// We start by understanding that we can only affect runs we can play on
+
+			for (Direction dir : direction) {
+				// Check each playable square to see if any winLength run arrays include it in
+				// any direction
+
+				for (int numberOfSpacesToMove = (gc.game.getWinLength()
+						- 1); numberOfSpacesToMove > 1; numberOfSpacesToMove--) {
+					// Start checking with the runs that are one token away from a win; end before
+					// checking single tokens because they're not really "runs"
+
+					BoardSquare startingSquare = new BoardSquare(playableSquare);
+
+					// Skip if we can't move far enough; we'll come back to it with a lower number
+					if (!enoughSpaceInDirection(startingSquare, dir.opposite, numberOfSpacesToMove)) {
+						continue;
+					} else {
+						startingSquare.move(dir.opposite, numberOfSpacesToMove);
+					}
+
+					for (int k = numberOfSpacesToMove; k >= 0; k--) {
+						// We're going to start the number of spaces we moved away from the origin and
+						// then iterate back, checking in blocks of game-winning length as we go.
+
+						if (!enoughSpaceInDirection(startingSquare, dir.direction, gc.game.getWinLength())) {
+							// If we can't move far enough and we're moving in that direction, we should
+							// break because it's not going to get any better
+							break;
+						}
+
+						// Read the squares into a ThreatMove object; we don't know if it has an owner
+						// yet, because we haven't determined whether or not it's a run
+						ThreatMove threateningRun = new ThreatMove(
+								iterateAndRead(startingSquare, dir.direction, gc.game.getWinLength()), playableSquare,
+								null, 0);
+
+						boolean mayBeRun = true;
+						for (int l = 0; l < threateningRun.threatSquares.size(); l++) {
+							// Now find out if this isn't a potential run
+
+							Player threateningPlayer = bc.readBoardSquare(threateningRun.threatSquares.get(l));
+
+							if (threateningPlayer == null) {
+								continue;
+							} else if (threateningRun.runOwner == null) {
+								threateningRun.runOwner = threateningPlayer;
+							} else if (threateningPlayer != threateningRun.runOwner) {
+								mayBeRun = false;
+								break;
+							}
+						}
+
+						if (!mayBeRun || threateningRun.runOwner == null) {
+							// If it's not a potential run, let's move to the next loop; if it is, add it to
+							// the list
+							continue;
+						}
+
+						for (BoardSquare square : threateningRun.threatSquares) {
+							// Calculate the severity (i.e. how many spaces are held by the owner)
+							if (bc.readBoardSquare(square) == null || threateningRun.runOwner == null) {
+								continue;
+							} else if (bc.readBoardSquare(square).index == threateningRun.runOwner.index) {
+								threateningRun.severity += 1;
+							}
+						}
+
+						// Now we need to make sure we tell the object which space in it can be played
+						threateningRun.runExtendingSquare = playableSquare;
+
+						if (threateningRun.severity >= (gc.game.getWinLength() - 2)) {
+							// If we've gotten this far, we know it's a run and have an owner and a severity
+							// ranking. Let's add it to the ArrayList if it hits our threshold
+							if (!threatMoves.contains(threateningRun)) {
+								threatMoves.add(threateningRun);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return threatMoves;
 	}
 
 	public static boolean isValidColumn(int col) {
@@ -65,7 +167,7 @@ public class BoardChecker {
 			// Somehow the row selection isn't valid...
 			throw new IllegalArgumentException(
 					"Somehow the row isn't valid for " + gc.game.getCurrentPlayerName() + ". Weird.");
-		} else if (bc.readBoardSquare(square) != -1) {
+		} else if (bc.readBoardSquare(square) != null) {
 			// The square isn't empty
 			return 1;
 		} else {
@@ -74,52 +176,11 @@ public class BoardChecker {
 		}
 	}
 
-	public static boolean isWinningMove(BoardMove move) {
-		directions = setUpDirectionArray(true);
-
-		for (int i = 0; i < directions.size(); i++) {
-			if (enoughSpaceInDirection(new BoardSquare(move.getBoardSquare()), directions.get(i),
-					gc.game.getWinLength())) {
-				boolean isWinner = isWinner(new BoardSquare(move.getBoardSquare()), directions.get(i));
-
-				if (isWinner) {
-					return isWinner;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	// Checks for a win (player ID) or a draw (-1)
-	public static int checkForWin(BoardMove move) {
-		// Returns:
-		// 0 = Game continues
-		// 1 = Player 1 wins (checkForWin)
-		// 2 = Player 2 wins (checkForWin)
-
-		// If we have a win, return the player number
-		if (BoardChecker.isWinningMove(move)) {
-			return (move.getPlayer().index + 1);
-		} else {
-			return 0;
-		}
-	}
-
-	public static boolean isDraw() {
-		if (bc.getLog().getMoves().size() == (bc.width() * bc.height())) {
-			return true;
-		} else {
-			// Iterate through the board to see if there are possible wins. If so, return 0.
-		}
-
-		return false;
-	}
-
 	// Gets the lowest open row for a given column
 	public static int getLowestRow(int col) {
 		for (int row = (bc.height() - 1); row >= 0; row--) {
-			if (bc.readBoardSquare(new BoardSquare(row, col)) == -1) {
+			BoardSquare possibleLowestSpace = new BoardSquare(row, col);
+			if (bc.readBoardSquare(possibleLowestSpace) == null) {
 				return row;
 			}
 		}
@@ -128,34 +189,16 @@ public class BoardChecker {
 		return -1;
 	}
 
-	private static ArrayList<String> setUpDirectionArray(boolean checkAllDirections) {
-		ArrayList<String> dir = new ArrayList<String>();
-
-		dir.add("S");
-		dir.add("SE");
-		dir.add("E");
-		dir.add("NE");
-
-		if (checkAllDirections) {
-			dir.add("SW");
-			dir.add("W");
-			dir.add("NW");
-			dir.add("N");
-		}
-
-		return dir;
-	}
-
 	private static boolean enoughSpaceInDirection(BoardSquare checkSquare, String direction, int length) {
 		if (direction.length() == 1) {
 			if (direction.equals("N")) {
-				return (checkSquare.row() >= (length - 1));
+				return (checkSquare.row() >= (length));
 			} else if (direction.equals("S")) {
-				return (checkSquare.row() <= (bc.height() - length));
+				return (checkSquare.row() < (bc.height() - length));
 			} else if (direction.equals("E")) {
-				return (checkSquare.col() <= (bc.width() - length));
+				return (checkSquare.col() < (bc.width() - length));
 			} else if (direction.equals("W")) {
-				return (checkSquare.col() >= (length - 1));
+				return (checkSquare.col() >= (length));
 			} else {
 				return false;
 			}
@@ -163,8 +206,8 @@ public class BoardChecker {
 			boolean ret = true;
 			char[] d = direction.toCharArray();
 
-			for (int i = 0; i < d.length; i++) {
-				if (!enoughSpaceInDirection(checkSquare, String.valueOf(d[i]), length)) {
+			for (char c : d) {
+				if (!enoughSpaceInDirection(checkSquare, String.valueOf(c), length)) {
 					ret = false;
 				}
 			}
@@ -173,14 +216,13 @@ public class BoardChecker {
 		}
 	}
 
-	private static boolean isWinner(BoardSquare checkSquare, String direction) {
-		ArrayList<BoardSquare> squares = iterateAndRead(checkSquare, direction, gc.game.getWinLength());
+	private static boolean isWinner(BoardMove checkMove, String direction) {
+		ArrayList<BoardSquare> squares = iterateAndRead(checkMove.getBoardSquare(), direction, gc.game.getWinLength());
 
-		int equality = checkEquality(squares);
-		if (equality == -1 || equality == 0) {
-			return false;
-		} else {
+		if (checkMove.getPlayer() != null && checkMove.getPlayer().index == checkEquality(squares)) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -197,10 +239,11 @@ public class BoardChecker {
 	}
 
 	private static int checkEquality(ArrayList<BoardSquare> squares) {
-		if (Utilities.allAreEqual(bc, squares) && bc.readBoardSquare(squares.get(0)) != -1) {
-			return bc.readBoardSquare((BoardSquare) squares.get(0)) + 1;
+		Player player = bc.readBoardSquare((BoardSquare) squares.get(0));
+		if (player == null || !Utilities.allAreEqual(bc, squares)) {
+			return -1;
 		} else {
-			return 0;
+			return bc.readBoardSquare((BoardSquare) squares.get(0)).index;
 		}
 	}
 }

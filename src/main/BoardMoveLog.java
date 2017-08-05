@@ -46,7 +46,7 @@ public class BoardMoveLog {
 			for (int i = (moves.size() - 1); i >= 0; i--) {
 				if (moves.get(i).getPlayer().isHuman) {
 					// Add all the subsequent moves to the ArrayList
-					for (int j = (i + 1); i < moves.size(); i++) {
+					for (int j = (i + 1); j < moves.size(); j++) {
 						movesByAI.add(moves.get(j));
 					}
 

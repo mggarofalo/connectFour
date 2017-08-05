@@ -28,26 +28,30 @@ public class BoardSquare {
 	}
 
 	public String coordinatesReadable() {
-		return new String("display row " + (row + 1) + ", display column " + (col + 1));
+		return new String("display row " + (row + 1) + " (from top), display column " + (col + 1) + " (from left)");
 	}
 
-	public void move(String direction) {
+	public void move(String direction, int numberOfSpaces) {
 		if (direction.length() == 1) {
 			if (direction.equals("N")) {
-				row -= 1;
+				row -= numberOfSpaces;
 			} else if (direction.equals("E")) {
-				col += 1;
+				col += numberOfSpaces;
 			} else if (direction.equals("S")) {
-				row += 1;
+				row += numberOfSpaces;
 			} else if (direction.equals("W")) {
-				col -= 1;
+				col -= numberOfSpaces;
 			}
 		} else {
 			char[] dir = direction.toCharArray();
 
 			for (int i = 0; i < dir.length; i++) {
-				move(String.valueOf(dir[i]));
+				move(String.valueOf(dir[i]), numberOfSpaces);
 			}
 		}
+	}
+
+	public void move(String direction) {
+		move(direction, 1);
 	}
 }

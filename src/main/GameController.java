@@ -34,51 +34,46 @@ public class GameController {
 	}
 
 	private int handleAIMove() {
-		// Check the board for runs of (winLength - 1) that could be extended or blocked
-		// with the next move.
-		Object[][] extendingMoves = BoardChecker.findMoveThatExtendsRun(game.getWinLength());
+		// Check the board for winning runs that could be extended or blocked with the
+		// next move.
+		ArrayList<ThreatMove> threatMoves = BoardChecker.findMovesThatExtendRun();
 
 		// If there are any extending moves possible, let's handle one of those first
-		if (extendingMoves.length > 0) {
+		if (threatMoves != null) {
 			// If the current player has a run of 3, playing will win, so let's do that
-			for (int i = 0; i < extendingMoves[2].length; i++) {
-				if ((int) extendingMoves[2][i] == game.getCurrentPlayerController().getIndex()) {
-					BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(),
-							game.boardController.getMoveForColumn(((BoardSquare) extendingMoves[0][0]).col()));
-					game.boardController.makeMove(move);
-					return BoardChecker.checkForWin(move);
+			for (ThreatMove threatMove : threatMoves) {
+				if (threatMove.runOwner == null) {
+					continue;
+				} else if (threatMove.severity == (game.getWinLength() - 1)
+						&& threatMove.runOwner.index == game.getCurrentPlayerController().getIndex()) {
+					return makeAIMove(threatMove.runExtendingSquare);
 				}
 			}
 
 			// If the current player doesn't have a winning move, play to block; if multiple
-			// are found, play on the first one
-			BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(),
-					game.boardController.getMoveForColumn(((BoardSquare) extendingMoves[0][0]).col()));
-			game.boardController.makeMove(move);
-			return BoardChecker.checkForWin(move);
+			// such moves are found, it doesn't matter which we play on, so play on the
+			// first one that comes up
+			for (ThreatMove threatMove : threatMoves) {
+				if (threatMove.runOwner == null) {
+					continue;
+				} else if (threatMove.severity == (game.getWinLength() - 1)
+						&& threatMove.runOwner.index != game.getCurrentPlayerController().getIndex()) {
+					return makeAIMove(threatMove.runExtendingSquare);
+				}
+			}
 		}
 
-		// Find the move that will make the longest line where four are possible and
-		// play on it.
+		// Since this is a simple AI, we're just going to pick a random move if there
+		// isn't a block-or-win opportunity
+		ArrayList<BoardSquare> possibleMoves = game.boardController.getPlayableSquares();
+		return makeAIMove(possibleMoves.get(ConnectFour.rand.nextInt(possibleMoves.size())));
+	}
 
-		// Try blocking a single opponent token where four are possible.
-		// continue;
-
-		// Try playing in a random open space where four are possible.
-		// continue;
-
-		// If no such move is possible, play in a random open space.
-		// continue;
-
-		// Check the board for threats (open 2 or closed 3)
-		// BoardSquare[] threat = BoardChecker.checkForThreats(game.boardController,
-		// move);
-
-		// Check the board for line extensions
-
-		// Make the move
-		// return tryToMove(move.col());
-		return 0;
+	private int makeAIMove(BoardSquare square) {
+		BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(),
+				game.boardController.getMoveForColumn(square.col()));
+		game.boardController.makeMove(move);
+		return BoardChecker.checkForWin(move);
 	}
 
 	private void printAIMoves() {
@@ -88,6 +83,11 @@ public class GameController {
 		if (movesByAI.size() > 0) {
 			// Print a spacer
 			Utilities.println();
+
+			// If there were multiple moves, print a header
+			if (movesByAI.size() > 1) {
+				Utilities.println("There were " + movesByAI.size() + " AI moves:");
+			}
 
 			// Print the moves
 			for (int i = 0; i < movesByAI.size(); i++) {
@@ -136,7 +136,6 @@ public class GameController {
 			BoardMove move = new BoardMove(new Date(), game.getCurrentPlayerController().getPlayer(), square);
 			game.boardController.makeMove(move);
 			return BoardChecker.checkForWin(move);
-
 		}
 	}
 

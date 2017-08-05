@@ -14,17 +14,17 @@ public class Board {
 
 	// The board is a two-dimensional int matrix (-1 is empty). Board spaces are
 	// checked with board[r][c] (board[h][w]).
-	public int[][] boardArray = new int[][] {};
+	public Player[][] boardArray = new Player[][] {};
 
 	public final int rows;
 	public final int columns;
 
-	public Board(int[][] boardArray) {
+	public Board(Player[][] boardArray) {
 		// Set the width and height variables
 		rows = boardArray.length;
 		columns = boardArray[0].length;
 
-		this.boardArray = boardArray;
+		this.boardArray = new Player[rows][columns];
 	}
 
 	public int height() {

@@ -3,7 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class PlayerGeneratorAI {
+public class PlayerGenerator {
 
 	private static ArrayList<String[]> prefixes = new ArrayList<String[]>();
 	private static ArrayList<String[]> firstNames = new ArrayList<String[]>();

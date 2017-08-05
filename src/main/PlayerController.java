@@ -11,6 +11,10 @@ public class PlayerController {
 		this.player = new Player(name, token, index, isHuman);
 	}
 
+	public PlayerController(Player player) {
+		this.player = player;
+	}
+
 	public Player getPlayer() {
 		return this.player;
 	}

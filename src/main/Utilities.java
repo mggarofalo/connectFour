@@ -246,6 +246,7 @@ public class Utilities {
 			System.out.println(s);
 		} else {
 			System.out.print(s);
+			System.out.flush();
 		}
 	}
 
