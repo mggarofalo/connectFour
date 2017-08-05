@@ -11,16 +11,16 @@ The moves will be stored in a List and, ideally, synced to a RDB. The program wi
 ## Component List
 
 #### Initial variables
-- Board size (default 7c6r, but there's no reason that couldn't be altered). Note: it's been altered. Any size board, although the formatting is still a little weird.
+- Board size is set initially, but this program can support any size board. The formatting is weird with even-width columns, but that's an artifact of blocks the size of letters.
 - Level 1/2: Human/AI selector for P1 and P2 (the player will be a controller and its input will come from the command line or from a decision engine of some kind); in this case, we will also initialize first player selection
-- Boss: Difficulty selector for each AI that governs whether it plays randomly except to block
+- Boss: Difficulty selector for each AI that governs whether it plays randomly except to win or block or plays with an advanced (look-ahead) strategy.
 	
 #### Level 2: AIPlayer (stub)
-- [ ] Checks for threats from all moves since its last turn.
-- [ ] Find the move that will make the longest line where four are possible.
-- [ ] If no such move is possible, try playing adjacent to a single opponent token where four are possible.
-- [ ] If no such move is possible, try playing in a random open space where four are possible.
-- [ ] If no such move is possible, play in a random open space.
+- [X] Checks for threats across the whole board.
+- [X] If a win is possible, play to win.
+- [X] If a win-block is possible, play to block.
+- [X] If neither win nor win-block are available, play randomly.
+- [X] Build the threat detection and reaction system such that its thresholds can be altered and the AI can play more aggressively.
 
 #### PlayerInterface
 - [X] Takes console input and passes to board.
