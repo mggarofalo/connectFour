@@ -8,10 +8,22 @@ public class BoardChecker {
 	private static BoardController bc = ConnectFour.gameController.game.boardController;
 
 	public static boolean isDraw() {
-		if (bc.getLog().getMoves().size() == (bc.width() * bc.height())) {
+		if (bc.getPlayableSquares().size() == 0) {
 			return true;
 		} else {
-			// Iterate through the board to see if there are possible wins. If so, return 0.
+			ArrayList<ThreatMove> threatMoves = findMovesThatExtendRun();
+
+			if (threatMoves != null) {
+				// If any player has a threat, return false.
+				for (ThreatMove threatMove : threatMoves) {
+					if (threatMove.runOwner == null) {
+						continue;
+					} else {
+						return false;
+					}
+				}
+			}
+
 		}
 
 		return false;
@@ -19,20 +31,26 @@ public class BoardChecker {
 
 	// Checks for a win (player ID)
 	public static int checkForWin(BoardMove move) {
-		if (BoardChecker.isWinningMove(move)) {
-			// If we have a win, return the player number
-			return (move.getPlayer().index + 1);
-		} else {
-			// We have to check the whole board for a win, since wins can come by connecting
-			// two runs
-			for (int row = (bc.height() - 1); row >= 0; row--) {
-				for (int col = 0; col < bc.width(); col++) {
-					// Create a new BoardMove at the bottom left, iterating right and up
-					BoardMove moveToCheckForWin = new BoardMove(move.getDate(),
-							bc.readBoardSquare(new BoardSquare(row, col)), new BoardSquare(row, col));
-					if (isWinningMove(moveToCheckForWin)) {
-						return (move.getPlayer().index + 1);
-					}
+		// Note: we could merge this with the threat checker and return a win flag at
+		// the first severity(winLength) threat found.
+
+		// This and the threat checker really represent two different methods of
+		// checking the board. This one checks to see if a given square is at the end of
+		// any winning run and the threat checker looks to see whether the given square
+		// is included in any winLength run belonging exclusively to one player.
+
+		// The only reason not to merge this code now is that the threat checker is
+		// built to help players out, so it only iterates through playable squares. A
+		// threat is, then, by definition herein, a run of winLength in which at least
+		// one square is playable and in which only one player's tokens appear.
+
+		for (int row = (bc.height() - 1); row >= 0; row--) {
+			for (int col = 0; col < bc.width(); col++) {
+				// Create a new BoardMove at the bottom left, iterating right and up
+				BoardMove moveToCheckForWin = new BoardMove(move.getDate(),
+						bc.readBoardSquare(new BoardSquare(row, col)), new BoardSquare(row, col));
+				if (isWinningMove(moveToCheckForWin)) {
+					return (move.getPlayer().index + 1);
 				}
 			}
 		}
@@ -59,8 +77,6 @@ public class BoardChecker {
 	}
 
 	public static ArrayList<ThreatMove> findMovesThatExtendRun() {
-		gc.game.boardController.printBoard(gc.game.playerController);
-
 		ArrayList<Direction> direction = Direction.setUpDirectionArray(true);
 		ArrayList<BoardSquare> playableSquares = bc.getPlayableSquares();
 
@@ -106,10 +122,10 @@ public class BoardChecker {
 								null, 0);
 
 						boolean mayBeRun = true;
-						for (int l = 0; l < threateningRun.threatSquares.size(); l++) {
+						for (BoardSquare threatSquare : threateningRun.threatSquares) {
 							// Now find out if this isn't a potential run
 
-							Player threateningPlayer = bc.readBoardSquare(threateningRun.threatSquares.get(l));
+							Player threateningPlayer = bc.readBoardSquare(threatSquare);
 
 							if (threateningPlayer == null) {
 								continue;
@@ -122,8 +138,7 @@ public class BoardChecker {
 						}
 
 						if (!mayBeRun || threateningRun.runOwner == null) {
-							// If it's not a potential run, let's move to the next loop; if it is, add it to
-							// the list
+							// If it's not a potential run, let's move to the next loop
 							continue;
 						}
 
@@ -141,8 +156,20 @@ public class BoardChecker {
 
 						if (threateningRun.severity >= (gc.game.getWinLength() - 2)) {
 							// If we've gotten this far, we know it's a run and have an owner and a severity
-							// ranking. Let's add it to the ArrayList if it hits our threshold
-							if (!threatMoves.contains(threateningRun)) {
+							// ranking. Let's add it to the ArrayList if it hits our threshold and isn't
+							// already there. Stupid Java, not letting objects with identical contents
+							// evaluate to (ArrayList.contains() == true) just because they're not two
+							// references to the same thing...
+
+							boolean addToThreatMoveArray = true;
+							for (ThreatMove threatMove : threatMoves) {
+								if (threatMove.runExtendingSquare.coordinates() == threateningRun.runExtendingSquare
+										.coordinates() && threatMove.severity >= threateningRun.severity) {
+									addToThreatMoveArray = false;
+								}
+							}
+
+							if (addToThreatMoveArray) {
 								threatMoves.add(threateningRun);
 							}
 						}

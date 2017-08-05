@@ -27,6 +27,7 @@ public class ConnectFour {
 
 		Utilities.print("Would you like to play a human vs. AI game of Connect-Four with " + columns + " columns of "
 				+ rows + " rows? (Y/N) ");
+
 		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "YES", "N", "NO" }, "choice", false);
 		if (choice.equalsIgnoreCase("Y") || choice.equalsIgnoreCase("YES")) {
 			setUpHumanVsAIGame();
@@ -52,7 +53,7 @@ public class ConnectFour {
 		playerController = new PlayerController[players + playersAI];
 
 		// Ask for players' names and tokens
-		setUpPlayers();
+		setUpHumanPlayers();
 
 		// Show game instructions
 		printInstructions();
@@ -72,8 +73,9 @@ public class ConnectFour {
 		String choice = Utilities.makeUserInputStringFromArray(new String[] { "Y", "YES", "N", "NO" }, "choice", false);
 
 		if (choice.equalsIgnoreCase("N") || choice.equalsIgnoreCase("NO")) {
-			Utilities.print("How many players are there? ");
+			Utilities.print("How many human players are there? ");
 			players = Utilities.makeUserInputAPositiveNumber();
+
 			name = new String[players];
 			token = new String[players];
 			playerController = new PlayerController[players];
@@ -89,7 +91,7 @@ public class ConnectFour {
 		}
 
 		// Ask for players' names and tokens
-		setUpPlayers();
+		setUpHumanPlayers();
 
 		// Show game instructions
 		printInstructions();
@@ -104,7 +106,7 @@ public class ConnectFour {
 		Utilities.println("Thanks for playing!");
 	}
 
-	private static void setUpPlayers() {
+	private static void setUpHumanPlayers() {
 		for (int i = 0; i < players; i++) {
 			Utilities.println();
 			Utilities.print("Hey there, Player " + (i + 1) + ". What's your name? ");
