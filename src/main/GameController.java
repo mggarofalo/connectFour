@@ -46,6 +46,7 @@ public class GameController {
 					continue;
 				} else if (threatMove.severity == (game.getWinLength() - 1)
 						&& threatMove.runOwner.index == game.getCurrentPlayerController().getIndex()) {
+					Utilities.println(game.getCurrentPlayerName() + " played to win.");
 					return makeAIMove(threatMove.runExtendingSquare);
 				}
 			}
@@ -58,6 +59,7 @@ public class GameController {
 					continue;
 				} else if (threatMove.severity == (game.getWinLength() - 1)
 						&& threatMove.runOwner.index != game.getCurrentPlayerController().getIndex()) {
+					Utilities.println(game.getCurrentPlayerName() + " played to block.");
 					return makeAIMove(threatMove.runExtendingSquare);
 				}
 			}
@@ -65,6 +67,7 @@ public class GameController {
 
 		// Since this is a simple AI, we're just going to pick a random move if there
 		// isn't a block-or-win opportunity
+		Utilities.println(game.getCurrentPlayerName() + " played randomly.");
 		ArrayList<BoardSquare> possibleMoves = game.boardController.getPlayableSquares();
 		return makeAIMove(possibleMoves.get(ConnectFour.rand.nextInt(possibleMoves.size())));
 	}
@@ -91,8 +94,8 @@ public class GameController {
 
 			// Print the moves
 			for (int i = 0; i < movesByAI.size(); i++) {
-				Utilities.println(movesByAI.get(i).getPlayer().name + " played at "
-						+ movesByAI.get(i).getBoardSquare().coordinatesReadable() + ".");
+				Utilities.println(movesByAI.get(i).getPlayer().name + " played in column "
+						+ (movesByAI.get(i).getBoardSquare().col() + 1) + ".");
 			}
 
 			// Print a spacer

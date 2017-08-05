@@ -37,7 +37,10 @@ public class ConnectFour {
 		Utilities.println();
 		Utilities.print("What would you like to play? ");
 
-		String gameTypeChoice = Utilities.makeUserInputStringFromArray(new String[] { "1", "2" }, "choice", false);
+		String gameTypeChoice = Utilities.makeUserInputStringFromArray(new String[] { "1", "2" }, "choice", false,
+				"That choice is not valid.");
+
+		Utilities.println();
 
 		if (gameTypeChoice.equals("1")) {
 			Utilities.print("Would you like to play a standard human vs. AI game of Connect-Four with "

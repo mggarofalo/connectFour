@@ -107,7 +107,8 @@ public class Utilities {
 
 	// Makes the user type yes, no, y, or n, and returns an appropriate boolean
 	public static boolean userSaysYes() {
-		String choice = makeUserInputStringFromArray(new String[] { "YES", "Y", "NO", "N" }, "choice", false);
+		String choice = makeUserInputStringFromArray(new String[] { "YES", "Y", "NO", "N" }, "choice", false,
+				"Please answer yes or no.");
 
 		if (choice.equalsIgnoreCase("Y") || choice.equalsIgnoreCase("YES")) {
 			return true;
@@ -150,11 +151,16 @@ public class Utilities {
 
 	// Sanitizes input to ensure that a given string does not already exist in a
 	// given array (case-sensitive optional)
-	public static String makeUserInputStringFromArray(String[] values, String inputName, boolean caseSensitive) {
+	public static String makeUserInputStringFromArray(String[] values, String inputName, boolean caseSensitive,
+			String customMessage) {
 		String input = key.nextLine();
 
 		while (!stringExistsInStringArray(values, input, caseSensitive)) {
-			Utilities.print("That " + inputName + " is already taken. Try again: ", false);
+			if (customMessage != null) {
+				Utilities.print(customMessage + " Try again: ");
+			} else {
+				Utilities.print("That " + inputName + " is already taken. Try again: ", false);
+			}
 			input = key.nextLine();
 		}
 
@@ -183,7 +189,7 @@ public class Utilities {
 		// Second error should be if the input is the right length but already exists in
 		// the array
 		if (Arrays.asList(values).contains(input)) {
-			Utilities.print("Sorry, but that " + inputName + " is taken already. Try again: ", false);
+			Utilities.print("Sorry, but that " + inputName + " is already taken. Try again: ", false);
 			input = makeUserInputUniqueString(values, inputName, length, requireNonWhiteSpace);
 		}
 
