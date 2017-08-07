@@ -111,7 +111,7 @@ public class BoardChecker {
 						// We're going to start the number of spaces we moved away from the origin and
 						// then iterate back, checking in blocks of game-winning length as we go.
 
-						if (!enoughSpaceInDirection(startingSquare, dir.direction, gc.game.getWinLength())) {
+						if (!enoughSpaceInDirection(startingSquare, dir.direction, gc.game.getWinLength() - 1)) {
 							// If we can't move far enough and we're moving in that direction, we should
 							// break because it's not going to get any better
 							break;
@@ -120,7 +120,7 @@ public class BoardChecker {
 						// Read the squares into a ThreatMove object; we don't know if it has an owner
 						// yet, because we haven't determined whether or not it's a run
 						ThreatMove threateningRun = new ThreatMove(
-								iterateAndRead(startingSquare, dir.direction, gc.game.getWinLength()), playableSquare,
+								readAndMove(startingSquare, dir.direction, gc.game.getWinLength()), playableSquare,
 								null, 0);
 
 						boolean mayBeRun = true;
@@ -230,7 +230,7 @@ public class BoardChecker {
 	}
 
 	private static boolean isWinner(BoardMove checkMove, String direction) {
-		ArrayList<BoardSquare> squares = iterateAndRead(checkMove.getBoardSquare(), direction, gc.game.getWinLength());
+		ArrayList<BoardSquare> squares = readAndMove(checkMove.getBoardSquare(), direction, gc.game.getWinLength());
 
 		if (checkMove.getPlayer() != null && checkMove.getPlayer().index == checkEquality(squares)) {
 			return true;
@@ -239,7 +239,7 @@ public class BoardChecker {
 		}
 	}
 
-	private static ArrayList<BoardSquare> iterateAndRead(BoardSquare startingSquare, String direction, int length) {
+	private static ArrayList<BoardSquare> readAndMove(BoardSquare startingSquare, String direction, int length) {
 		ArrayList<BoardSquare> squares = new ArrayList<BoardSquare>(length);
 		BoardSquare checkSquare = new BoardSquare(startingSquare);
 
