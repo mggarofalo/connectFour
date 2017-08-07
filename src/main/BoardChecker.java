@@ -154,39 +154,15 @@ public class BoardChecker {
 						// Now we need to make sure we tell the object which space in it can be played
 						threateningRun.runExtendingSquare = playableSquare;
 
-						if (threateningRun.severity >= (gc.game.getWinLength() - 2)) {
-							// If we've gotten this far, we know it's a run and have an owner and a severity
-							// ranking. Let's add it to the ArrayList if it hits our threshold and isn't
-							// already there. Stupid Java, not letting objects with identical contents
-							// evaluate to (ArrayList.contains() == true) just because they're not two
-							// references to the same thing...
-
-							boolean addToThreatMoveArray = true;
-							for (ThreatMove threatMove : threatMoves) {
-								if (threatMove.runExtendingSquare.coordinates() == threateningRun.runExtendingSquare
-										.coordinates() && threatMove.severity >= threateningRun.severity) {
-									addToThreatMoveArray = false;
-								}
-							}
-
-							if (addToThreatMoveArray) {
-								threatMoves.add(threateningRun);
-							}
-						}
+						// Finally, add it to the array if it passed the check above
+						threatMoves.add(threateningRun);
 					}
 				}
 			}
 		}
 
-		// Get rid of the runs that aren't owned by anyone
-		ArrayList<ThreatMove> realThreatMoves = new ArrayList<ThreatMove>();
-		for (ThreatMove threatMove : threatMoves) {
-			if (threatMove.runOwner != null) {
-				realThreatMoves.add(threatMove);
-			}
-		}
+		return threatMoves;
 
-		return realThreatMoves;
 	}
 
 	public static boolean isValidColumn(int col) {

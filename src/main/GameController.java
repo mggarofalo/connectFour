@@ -31,6 +31,9 @@ public class GameController {
 	}
 
 	private int handleAIMove() {
+		// Print a stub for the line describing the move
+		Utilities.print(game.getCurrentPlayerName() + " (" + game.getCurrentPlayerToken() + ") played");
+
 		// Check the board for winning runs that could be extended or blocked with the
 		// next move.
 		ArrayList<ThreatMove> threatMoves = BoardChecker.findMovesThatExtendRun();
@@ -71,13 +74,13 @@ public class GameController {
 
 		// Since this is a simple AI, we're just going to pick a random move if there
 		// isn't a block-win-extend opportunity
-		Utilities.println(game.getCurrentPlayerName() + " played randomly in column " + (chosenSquare.col() + 1) + ".");
+		Utilities.println(" randomly in column " + (chosenSquare.col() + 1) + ".");
 
 		return makeAIMove(chosenSquare);
 	}
 
 	private int makeAIMove(ThreatMove threatMove, boolean belongsToCurrentPlayer) {
-		Utilities.print(game.getCurrentPlayerName() + " played to ");
+		Utilities.print(" to ");
 
 		if (threatMove.severity == (game.getWinLength() - 1)) {
 			Utilities.print((belongsToCurrentPlayer ? "win" : "block"));
