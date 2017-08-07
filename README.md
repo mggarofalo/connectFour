@@ -6,7 +6,7 @@
 ## About
 Connect Four is played on a 7x6 board. This program will take player and computer input, visually represent the game board in console output, track the moves, and identify wins.
 
-The moves will be stored in a List and, ideally, synced to a RDB. The program will be able identify danger and, ideally, strategic opportunities to allow the computer opponent to play intelligently, but I'm not 100% sure I can make that last part happen, given my limited knowledge of Connect Four strategy. I'll see what I can do.
+To begin the program, run ConnectFour.java.
 
 ## Component List
 
@@ -35,7 +35,7 @@ The moves will be stored in a List and, ideally, synced to a RDB. The program wi
 - [X] Finds the lowest open row in the given column.
 - [X] Displays the board by iterating through the matrix and printing output to the console.
 - [X] Otherwise returns (0) to the player.
-- [X] Fix formatting for 10+ columns.
+- [X] Fixed formatting for 10+ columns.
 
 #### Game
 - [X] Keeps track of current turn.
