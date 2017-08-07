@@ -130,7 +130,7 @@ public class ConnectFour {
 		}
 
 		// Set up the AI players
-		for (int i = players[1]; i < (players[0] + players[1]); i++) {
+		for (int i = players[0]; i < (players[0] + players[1]); i++) {
 			playerController[i] = new PlayerController(PlayerGenerator.generateAIPlayer(name, token, i));
 		}
 	}
