@@ -86,7 +86,8 @@ public class BoardChecker {
 		ArrayList<ThreatMove> threatMoves = new ArrayList<ThreatMove>();
 
 		for (BoardSquare playableSquare : playableSquares) {
-			// We start by understanding that we can only affect runs we can play on
+			// We start by assuming that we can only affect runs we can play on. This makes
+			// the AI adhere to the "ad hoc" playing strategy by avoiding look-ahead.
 
 			for (Direction dir : direction) {
 				// Check each playable square to see if any winLength run arrays include it in
