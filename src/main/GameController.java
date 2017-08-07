@@ -52,8 +52,9 @@ public class GameController {
 					boolean belongsToCurrentPlayer = true;
 
 					for (ThreatMove threatMove : threatMoves) {
-						// Skip the move if it's not the length we're looking for
-						if (threatMove.severity != i) {
+						// Skip the move if it's not the length we're looking for or if its owner is
+						// null
+						if (threatMove.severity != i || threatMove.runOwner == null) {
 							continue;
 						}
 

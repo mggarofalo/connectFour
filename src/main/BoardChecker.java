@@ -47,8 +47,8 @@ public class BoardChecker {
 		for (int row = (bc.height() - 1); row >= 0; row--) {
 			for (int col = 0; col < bc.width(); col++) {
 				// Create a new BoardMove at the bottom left, iterating right and up
-				BoardMove moveToCheckForWin = new BoardMove(move.getDate(),
-						bc.readBoardSquare(new BoardSquare(row, col)), new BoardSquare(row, col));
+				BoardMove moveToCheckForWin = new BoardMove(null, bc.readBoardSquare(new BoardSquare(row, col)),
+						new BoardSquare(row, col));
 				if (isWinningMove(moveToCheckForWin)) {
 					return (move.getPlayer().index + 1);
 				}
@@ -64,7 +64,8 @@ public class BoardChecker {
 
 		for (Direction dir : direction) {
 
-			if (enoughSpaceInDirection(new BoardSquare(move.getBoardSquare()), dir.direction, gc.game.getWinLength())) {
+			if (enoughSpaceInDirection(new BoardSquare(move.getBoardSquare()), dir.direction,
+					gc.game.getWinLength() - 1)) {
 				boolean isWinner = isWinner(move, dir.direction);
 
 				if (isWinner) {
