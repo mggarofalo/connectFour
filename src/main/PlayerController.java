@@ -7,8 +7,8 @@ public class PlayerController {
 	public PlayerController() {
 	}
 
-	public PlayerController(String name, String token, int index, boolean isHuman) {
-		this.player = new Player(name, token, index, isHuman);
+	public PlayerController(String name, String token, int index, boolean isHuman, boolean isFemale) {
+		this.player = new Player(name, token, index, isHuman, isFemale);
 	}
 
 	public PlayerController(Player player) {
@@ -33,5 +33,9 @@ public class PlayerController {
 
 	public boolean isHuman() {
 		return this.player.isHuman;
+	}
+
+	public boolean isFemale() {
+		return this.player.isFemale;
 	}
 }

@@ -11,15 +11,16 @@ public class PlayerGenerator {
 
 	public static Player generateAIPlayer(String[] name, String[] token, int index) {
 		setUpNameArrays();
-		return new Player(generateName(name), generateToken(token), index, false);
+		boolean isFemale = (ConnectFour.rand.nextInt() > 0.5 ? true : false);
+		return new Player(generateName(name, isFemale), generateToken(token), index, false, isFemale);
 	}
 
-	private static String generateName(String[] name) {
+	private static String generateName(String[] name, boolean isFemale) {
 		String proposal;
 		int loops = calculatePossibleLoops();
 
 		do {
-			proposal = constructName();
+			proposal = constructName(isFemale);
 			loops -= 1;
 		} while (Utilities.stringExistsInStringArray(name, proposal, true) && loops > 0);
 		return proposal;
@@ -44,11 +45,10 @@ public class PlayerGenerator {
 		return loops;
 	}
 
-	private static String constructName() {
-		int gender = (ConnectFour.rand.nextInt() > 0.5 ? 0 : 1);
-
-		String prefix = prefixes.get(gender)[ConnectFour.rand.nextInt(prefixes.get(gender).length)];
-		String firstName = firstNames.get(gender)[ConnectFour.rand.nextInt(firstNames.get(gender).length)];
+	private static String constructName(boolean isFemale) {
+		String prefix = prefixes.get(isFemale ? 0 : 1)[ConnectFour.rand.nextInt(prefixes.get(isFemale ? 0 : 1).length)];
+		String firstName = firstNames.get(isFemale ? 0 : 1)[ConnectFour.rand
+				.nextInt(firstNames.get(isFemale ? 0 : 1).length)];
 		String lastName = lastNames.get(ConnectFour.rand.nextInt(lastNames.size()));
 
 		return new String(prefix + " " + firstName + " " + lastName);
@@ -94,11 +94,11 @@ public class PlayerGenerator {
 	}
 
 	private static void setUpNameArrays() {
-		prefixes.add(new String[] { "Mr.", "Sir", "Lord", "Duke", "His Majesty the King" });
 		prefixes.add(new String[] { "Ms.", "Madam", "Lady", "Duchess", "Her Majesty the Queen" });
+		prefixes.add(new String[] { "Mr.", "Sir", "Lord", "Duke", "His Majesty the King" });
 
-		firstNames.add(new String[] { "Lothar", "Childebert", "Clovis", "Theuderic", "Childeric" });
 		firstNames.add(new String[] { "Basina", "Bilichildis", "Brunhild", "Clotild", "Theudechild" });
+		firstNames.add(new String[] { "Lothar", "Childebert", "Clovis", "Theuderic", "Childeric" });
 
 		String[] lastName = new String[] { "Smithbot", "Johnsonbot", "Williamsbot", "Jonesbot", "Brownbot", "Davisbot",
 				"Millerbot", "Wilsonbot", "Moorebot", "Taylorbot" };

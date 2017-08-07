@@ -23,9 +23,6 @@ public class GameController {
 	}
 
 	private int handleHumanMove() {
-		// Print any AI moves since the last human move
-		printAIMoves();
-
 		// Print prompt and new board
 		printNewBoardAndPrompt();
 
@@ -40,36 +37,63 @@ public class GameController {
 
 		// If there are any extending moves possible, let's handle one of those first
 		if (threatMoves != null) {
-			// If the current player has a run of 3, playing will win, so let's do that
-			for (ThreatMove threatMove : threatMoves) {
-				if (threatMove.runOwner == null) {
-					continue;
-				} else if (threatMove.severity == (game.getWinLength() - 1)
-						&& threatMove.runOwner.index == game.getCurrentPlayerController().getIndex()) {
-					Utilities.println(game.getCurrentPlayerName() + " played to win.");
-					return makeAIMove(threatMove.runExtendingSquare);
-				}
-			}
+			for (int i = (game.getWinLength() - 1); i > 0; i--) {
+				// Iterate down through the lengths, prioritizing the extending the AI's runs
+				// over blocking opponents'. First we play to win, then to block a win, then to
+				// extend our longest run or block an opponent's longest run
 
-			// If the current player doesn't have a winning move, play to block; if multiple
-			// such moves are found, it doesn't matter which we play on, so play on the
-			// first one that comes up
-			for (ThreatMove threatMove : threatMoves) {
-				if (threatMove.runOwner == null) {
-					continue;
-				} else if (threatMove.severity == (game.getWinLength() - 1)
-						&& threatMove.runOwner.index != game.getCurrentPlayerController().getIndex()) {
-					Utilities.println(game.getCurrentPlayerName() + " played to block.");
-					return makeAIMove(threatMove.runExtendingSquare);
+				for (int j = 0; j <= 1; j++) {
+					// The first loop here is to look for opportunities of the outer-loop length
+					// that belong to the current player. The second is to look for opportunities
+					// that belong to an opponent
+					boolean belongsToCurrentPlayer = true;
+
+					for (ThreatMove threatMove : threatMoves) {
+						// Skip the move if it's not the length we're looking for
+						if (threatMove.severity != i) {
+							continue;
+						}
+
+						// If it matches our boolean, let's make the move
+						if (belongsToCurrentPlayer == (threatMove.runOwner.index == game.getCurrentPlayerController()
+								.getIndex())) {
+							return makeAIMove(threatMove, belongsToCurrentPlayer);
+						}
+
+						belongsToCurrentPlayer = false;
+					}
 				}
 			}
 		}
 
+		ArrayList<BoardSquare> playableSquares = game.boardController.getPlayableSquares();
+		BoardSquare chosenSquare = playableSquares.get(ConnectFour.rand.nextInt(playableSquares.size()));
+
 		// Since this is a simple AI, we're just going to pick a random move if there
-		// isn't a block-or-win opportunity
-		Utilities.println(game.getCurrentPlayerName() + " played randomly.");
-		ArrayList<BoardSquare> possibleMoves = game.boardController.getPlayableSquares();
-		return makeAIMove(possibleMoves.get(ConnectFour.rand.nextInt(possibleMoves.size())));
+		// isn't a block-win-extend opportunity
+		Utilities.println(game.getCurrentPlayerName() + " played randomly in column " + (chosenSquare.col() + 1) + ".");
+
+		return makeAIMove(chosenSquare);
+	}
+
+	private int makeAIMove(ThreatMove threatMove, boolean belongsToCurrentPlayer) {
+		Utilities.print(game.getCurrentPlayerName() + " played to ");
+
+		if (threatMove.severity == (game.getWinLength() - 1)) {
+			Utilities.print((belongsToCurrentPlayer ? "win" : "block"));
+		} else {
+			Utilities.print((belongsToCurrentPlayer ? "extend" : "block"));
+			if (belongsToCurrentPlayer) {
+				Utilities.print(" " + (game.getCurrentPlayerController().isFemale() ? "her" : "his") + " run of "
+						+ threatMove.severity);
+			} else {
+				Utilities.print(" " + threatMove.runOwner.name + "\'s run of " + threatMove.severity);
+			}
+		}
+
+		Utilities.println(" in column " + (threatMove.runExtendingSquare.col() + 1));
+
+		return makeAIMove(threatMove.runExtendingSquare);
 	}
 
 	private int makeAIMove(BoardSquare square) {
@@ -77,30 +101,6 @@ public class GameController {
 				game.boardController.getMoveForColumn(square.col()));
 		game.boardController.makeMove(move);
 		return BoardChecker.checkForWin(move);
-	}
-
-	private void printAIMoves() {
-		// If the last move was not played by a human player, display a message to this
-		// user detailing all AI moves since the last human player move
-		ArrayList<BoardMove> movesByAI = game.boardController.getLog().getLastAIMoves();
-		if (movesByAI.size() > 0) {
-			// Print a spacer
-			Utilities.println();
-
-			// If there were multiple moves, print a header
-			if (movesByAI.size() > 1) {
-				Utilities.println("There were " + movesByAI.size() + " AI moves:");
-			}
-
-			// Print the moves
-			for (int i = 0; i < movesByAI.size(); i++) {
-				Utilities.println(movesByAI.get(i).getPlayer().name + " played in column "
-						+ (movesByAI.get(i).getBoardSquare().col() + 1) + ".");
-			}
-
-			// Print a spacer
-			Utilities.println();
-		}
 	}
 
 	private void printNewBoardAndPrompt() {

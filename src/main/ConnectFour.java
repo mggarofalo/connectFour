@@ -23,6 +23,7 @@ public class ConnectFour {
 	// Player components
 	static String[] name = new String[players[0] + players[1]];
 	static String[] token = new String[players[0] + players[1]];
+	static boolean[] gender = new boolean[players[0] + players[1]];
 
 	// Game components
 	static PlayerController[] playerController = new PlayerController[players[0] + players[1]];
@@ -123,7 +124,9 @@ public class ConnectFour {
 			Utilities.print("And what symbol would you like as your token? ");
 			token[i] = Utilities.makeUserInputUniqueString(token, "token", String.valueOf(columns).length(), true);
 
-			playerController[i] = new PlayerController(name[i], token[i], i, true);
+			// We never refer to the human player's gender, so we're just passing in true
+			// because it doesn't matter
+			playerController[i] = new PlayerController(name[i], token[i], i, true, true);
 		}
 
 		// Set up the AI players

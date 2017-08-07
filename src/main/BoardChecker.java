@@ -178,7 +178,15 @@ public class BoardChecker {
 			}
 		}
 
-		return threatMoves;
+		// Get rid of the runs that aren't owned by anyone
+		ArrayList<ThreatMove> realThreatMoves = new ArrayList<ThreatMove>();
+		for (ThreatMove threatMove : threatMoves) {
+			if (threatMove.runOwner != null) {
+				realThreatMoves.add(threatMove);
+			}
+		}
+
+		return realThreatMoves;
 	}
 
 	public static boolean isValidColumn(int col) {
